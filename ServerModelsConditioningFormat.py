@@ -12,7 +12,7 @@ class GnPytorchModel(BackendModel):
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = str(gpuid)
         self.model_fn = model_fn
-        self.opts = json.load("/mnt/blobfuse/train-output/conditioning/models/backup_conditioning_groups/training/params.json", "r")["model_opts"]
+        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_conditioning_groups/training/params.json", "r"))["model_opts"]
 
     def run(self, naip_data, naip_fn, extent, buffer, gammas, betas):
         return self.run_model_on_tile(naip_data, gammas, betas), os.path.basename(self.model_fn)
@@ -33,7 +33,7 @@ class GnPytorchModel(BackendModel):
 class InferenceFramework():
     def __init__(self, model, opts):
         self.opts = opts
-        self.model = model(opts)
+        self.model = model(self.opts)
 
 
     def load_model(self, path_2_saved_model):
@@ -45,31 +45,31 @@ class InferenceFramework():
         """
         Activations to write for the duke U-net
         """
-        down_1 = self.down_1(x)
-        pool_1 = self.pool_1(down_1)
-        down_2 = self.down_2(pool_1)
-        pool_2 = self.pool_2(down_2)
-        down_3 = self.down_3(pool_2)
-        pool_3 = self.pool_3(down_3)
-        down_4 = self.down_4(pool_3)
-        pool_4 = self.pool_4(down_4)
+        down_1 = self.model.down_1(x)
+        pool_1 = self.model.pool_1(down_1)
+        down_2 = self.model.down_2(pool_1)
+        pool_2 = self.model.pool_2(down_2)
+        down_3 = self.model.down_3(pool_2)
+        pool_3 = self.model.pool_3(down_3)
+        down_4 = self.model.down_4(pool_3)
+        pool_4 = self.model.pool_4(down_4)
 
-        bridge = self.bridge(pool_4)
+        bridge = self.model.bridge(pool_4)
 
-        deconv_1 = self.deconv_1(bridge)
+        deconv_1 = self.model.deconv_1(bridge)
         skip_1 = (deconv_1 + down_4) / 2
-        up_1 = self.up_1(skip_1)
-        deconv_2 = self.deconv_2(up_1)
+        up_1 = self.model.up_1(skip_1)
+        deconv_2 = self.model.deconv_2(up_1)
         skip_2 = (deconv_2 + down_3) / 2
-        up_2 = self.up_2(skip_2)
-        deconv_3 = self.deconv_3(up_2)
+        up_2 = self.model.up_2(skip_2)
+        deconv_3 = self.model.deconv_3(up_2)
         skip_3 = (deconv_3 + down_2) / 2
-        up_3 = self.up_3(skip_3)
-        deconv_4 = self.deconv_4(up_3)
+        up_3 = self.model.up_3(skip_3)
+        deconv_4 = self.model.deconv_4(up_3)
         skip_4 = (deconv_4 + down_1) / 2
-        up_4 = self.up_4(skip_4)
+        up_4 = self.model.up_4(skip_4)
 
-        out = self.out(up_4)
+        out = self.model.out(up_4)
         gammas = np.zeros((1, 32, 1, 1))
         gammas[0, :8, 0, 0] = gamma[0]
         gammas[0, 8:16, 0, 0] = gamma[1]
@@ -83,7 +83,7 @@ class InferenceFramework():
         betas[0, 24:32, 0, 0] = beta[3]
 
         out = out * gammas + betas
-        out = self.out_2(out)
+        out = self.model.out_2(out)
 
         return out
 
