@@ -4,6 +4,7 @@ from ServerModelsAbstract import BackendModel
 import torch
 from torch.autograd import Variable
 from fusionnet import Fusionnet
+import json
 
 class GnPytorchModel(BackendModel):
 
@@ -11,7 +12,7 @@ class GnPytorchModel(BackendModel):
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = str(gpuid)
         self.model_fn = model_fn
-        self.opts = "/mnt/blobfuse/train-output/conditioning/models/backup_conditioning_groups/training/params.json"
+        self.opts = json.load("/mnt/blobfuse/train-output/conditioning/models/backup_conditioning_groups/training/params.json", "r")["model_opts"]
 
     def run(self, naip_data, naip_fn, extent, buffer, gammas, betas):
         return self.run_model_on_tile(naip_data, gammas, betas), os.path.basename(self.model_fn)

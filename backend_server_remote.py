@@ -45,6 +45,8 @@ def pred_patch(model):
     data = bottle.request.json
     extent = data["extent"]
     weights = np.array(data["weights"], dtype=np.float32)
+    gammas = np.array(data["gammas"], dtype=np.float32)
+    betas = np.array(data["betas"], dtype=np.float32)
 
     # ------------------------------------------------------
     # Step 1
@@ -96,7 +98,7 @@ def pred_patch(model):
     # OLD VERSION
     # output, name = model(naip_data, tile_fn, extent, padding)
     #output = np.random.rand(naip_data.shape[0], naip_data.shape[0], 4)
-    output = model(naip_data)
+    output, name = model(naip_data, gammas, betas)
     output = np.rollaxis(output, 0, 3)
 
     def softmax(output):
@@ -178,7 +180,7 @@ def main():
         loaded_model = ServerModelsICLR.run
     elif args.model == "3":
         import ServerModelsConditioningFormat
-        loaded_model = ServerModelsConditioningFormat.GnPytorchModel.run
+        loaded_model = ServerModelsConditioningFormat.GnPytorchModel(args.model_fn, args.gpuid).run
     else:
         print("Model isn't implemented, aborting")
         return
