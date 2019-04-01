@@ -18,7 +18,7 @@ class CachedModel(BackendModel):
     def __init__(self, results_dir):
         self.results_dir = results_dir
 
-    def run(self, naip_data, naip_fn, extent, buffer):
+    def run(self, naip_data, naip_fn, extent, buffer, gammas, betas):
         return self.get_cached_by_extent(naip_fn, extent, buffer), "Full USA Pre-run %s" % (self.results_dir)
 
     def get_cached_by_extent(self, fn, extent, buffer):

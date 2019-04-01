@@ -17,7 +17,7 @@ import DataLoader
 import GeoTools
 import utils
 
-import ServerModelsICLRFormat, ServerModelsCachedFormat
+import ServerModelsICLRFormat, ServerModelsCachedFormat, ServerModelsConditioningFormat
 
 def enable_cors():
     '''From https://gist.github.com/richard-flosi/3789163
@@ -45,6 +45,8 @@ def pred_patch(model):
     data = bottle.request.json
     extent = data["extent"]
     weights = np.array(data["weights"], dtype=np.float32)
+    gammas = np.array(data["gammas"], dtype=np.float32)
+    betas = np.array(data["betas"], dtype=np.float32)
 
     # ------------------------------------------------------
     # Step 1
@@ -89,7 +91,7 @@ def pred_patch(model):
     # ------------------------------------------------------
     #output, name = ServerModels_Baseline_Blg_test.run_cnn(naip_data, landsat_data, blg_data, with_smooth=False)
     #name += "_with_smooth_False"
-    output, name = model.run(naip_data, naip_fn, extent, padding)
+    output, name = model.run(naip_data, naip_fn, extent, padding, gammas, betas)
     assert output.shape[2] == 4, "The model function should return an image shaped as (height, width, num_classes)"
     output *= weights[np.newaxis, np.newaxis, :] # multiply by the weight vector
     sum_vals = output.sum(axis=2) # need to normalize sums to 1 in order for the rendered output to be correct
@@ -167,7 +169,7 @@ def main():
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose debugging", default=False)
     parser.add_argument("--host", action="store", dest="host", type=str, help="Host to bind to", default="0.0.0.0")
     parser.add_argument("--port", action="store", dest="port", type=int, help="Port to listen on", default=4444)
-    parser.add_argument("--model", action="store", dest="model", choices=["cached", "keras", "iclr"], help="Model to use", required=True)
+    parser.add_argument("--model", action="store", dest="model", choices=["cached", "keras", "iclr", "gn_pytorch", "cfusionnet"], help="Model to use", required=True)
     parser.add_argument("--model_fn", action="store", dest="model_fn", type=str, help="Model fn to use", default=None)
     parser.add_argument("--gpu", action="store", dest="gpuid", type=int, help="GPU to use", default=0)
 
@@ -183,6 +185,10 @@ def main():
         model = ServerModelsICLRFormat.KerasModel(args.model_fn, args.gpuid)
     elif args.model == "iclr":
         model = ServerModelsICLRFormat.CNTKModel(args.model_fn, args.gpuid)
+    elif args.model == "gn_pytorch":
+        model = ServerModelsConditioningFormat.GnPytorchModel(args.model_fn, args.gpuid)
+    elif args.model == "cfusionnet":
+        model = ServerModelsConditioningFormat.CondFusionnetModel(args.model_fn, args.gpuid)
     else:
         print("Model isn't implemented, aborting")
         return

@@ -177,8 +177,8 @@ def main():
         import ServerModelsICLR
         loaded_model = ServerModelsICLR.run
     elif args.model == "3":
-        import ServerModelsMila
-        loaded_model = ServerModelsMila.run
+        import ServerModelsConditioningFormat
+        loaded_model = ServerModelsConditioningFormat.GnPytorchModel.run
     else:
         print("Model isn't implemented, aborting")
         return

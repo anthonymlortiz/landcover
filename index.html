@@ -244,6 +244,68 @@
                                 <input type="range" min="1" max="100" value="25" class="slider" id="builtRange">
                             </td>
                         </tr>
+
+                    </table>
+                </div>
+                <div style="text-align: center; margin-bottom:10px;" id="classConditioning">
+                    <h3>Change group conditioning params</h3>
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="text-align: center;">Scaling Group 1</td>
+                            <td style="width:30px;" id="gamma1Val">1</td>
+                            <td>
+                                <input type="range" min="-2" max="2" value="1" step="0.1" class="slider" id="gamma1Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Shifting Group 1</td>
+                            <td style="width:30px;" id="beta1Val">0</td>
+                            <td>
+                                <input type="range" min="0" max="100" value="0" class="slider" id="beta1Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Scaling Group 2</td>
+                            <td style="width:30px;" id="gamma2Val">1</td>
+                            <td>
+                                <input type="range" min="-2" max="2" value="1" step="0.1" class="slider" id="gamma2Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Shifting Group 2</td>
+                            <td style="width:30px;" id="beta2Val">0</td>
+                            <td>
+                                <input type="range" min="0" max="100" value="0" class="slider" id="beta2Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Scaling Group 3</td>
+                            <td style="width:30px;" id="gamma3Val">1</td>
+                            <td>
+                                <input type="range" min="-2" max="2" value="1" step="0.1" class="slider" id="gamma3Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Shifting Group 3</td>
+                            <td style="width:30px;" id="beta3Val">0</td>
+                            <td>
+                                <input type="range" min="0" max="100" value="0" class="slider" id="beta3Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Scaling Group 4</td>
+                            <td style="width:30px;" id="gamma4Val">1</td>
+                            <td>
+                                <input type="range" min="-2" max="2" value="1" step="0.1" class="slider" id="gamma4Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Shifting Group 4</td>
+                            <td style="width:30px;" id="beta4Val">0</td>
+                            <td>
+                                <input type="range" min="0" max="100" value="0" class="slider" id="beta4Range">
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -289,6 +351,10 @@
         var active_im_id = 0;
 
         var weights = [0.25, 0.25, 0.25, 0.25];
+
+        var gammas = [1, 1, 1, 1];
+
+        var betas = [0, 0, 0, 0];
 
         var requestPatches = function(polygon, weights_save, map){
 
@@ -443,6 +509,30 @@
                 $("#forestVal"),
                 $("#fieldVal"),
                 $("#builtVal")
+            ];
+            var gammaRanges = [
+                $("#gamma1Range"),
+                $("#gamma2Range"),
+                $("#gamma3Range"),
+                $("#gamma4Range")
+            ];
+            var gammaVals = [
+                $("#gamma1Val"),
+                $("#gamma2Val"),
+                $("#gamma3Val"),
+                $("#gamma4Val")
+            ];
+            var betaRanges = [
+                $("#beta1Range"),
+                $("#beta2Range"),
+                $("#beta3Range"),
+                $("#beta4Range")
+            ];
+            var betaVals = [
+                $("#beta1Val"),
+                $("#beta2Val"),
+                $("#beta3Val"),
+                $("#beta4Val")
             ];
 
             //----------------------------------------------------------------------
@@ -670,7 +760,52 @@
                     updateWeights();
                 });
             }
-            
+
+            //----------------------------------------------------------------------
+            // Setup gamma sliders
+            //----------------------------------------------------------------------
+            var updateGammas = function(){
+
+                for(var j=0;j<gammas.length;j++){
+                    gammas[j] = parseFloat(gammaRanges[j].val());
+                }
+
+                for(var j=0;j<gammas.length;j++){
+                    var value = gammas[j];
+                    gammaRanges[j].val(value);
+                    gammaVals[j].html(value);
+                }
+            }
+
+            for(var i=0;i<gammaRanges.length;i++){
+                gammaRanges[i].on("input", function(){
+                    updateGammas();
+                });
+            }
+
+            //----------------------------------------------------------------------
+            // Setup beta sliders
+            //----------------------------------------------------------------------
+            var updateBetas = function(){
+
+                for(var j=0;j<betas.length;j++){
+                    betas[j] = parseFloat(betaRanges[j].val());
+                }
+
+                for(var j=0;j<betas.length;j++){
+                    var value = betas[j];
+                    betaRanges[j].val(value);
+                    betaVals[j].html(value);
+                }
+            }
+
+            for(var i=0;i<betaRanges.length;i++) {
+                betaRanges[i].on("input", function () {
+                    updateBetas();
+                })
+            }
+
+
             //----------------------------------------------------------------------
             // Setup the example images list
             //----------------------------------------------------------------------

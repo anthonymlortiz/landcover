@@ -24,7 +24,7 @@ class KerasModel(BackendModel):
         self.output_channels = self.model.output_shape[3]
         self.input_size = self.model.input_shape[1]
 
-    def run(self, naip_data, naip_fn, extent, buffer):
+    def run(self, naip_data, naip_fn, extent, buffer, gammas, betas):
         return self.run_model_on_tile(naip_data), os.path.basename(self.model_fn)
 
     def run_model_on_tile(self, naip_tile, batch_size=32):
