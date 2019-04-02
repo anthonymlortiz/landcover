@@ -320,6 +320,24 @@
                         document.getElementById("beta2Range").value = 0;
                         document.getElementById("beta3Range").value = 0;
                         document.getElementById("beta4Range").value = 0;
+                        for(var j=0;j<gammas.length;j++){
+                            gammas[j] = 1;
+                        }
+
+                        for(var j=0;j<gammas.length;j++){
+                            var value = gammas[j];
+                            gammaRanges[j].val(value);
+                            gammaVals[j].html(value);
+                        }
+                        for(var j=0;j<betas.length;j++){
+                            betas[j] = 0;
+                        }
+
+                        for(var j=0;j<betas.length;j++){
+                            var value = betas[j];
+                            betaRanges[j].val(value);
+                            betaVals[j].html(value);
+                        }
 
                       }
 
