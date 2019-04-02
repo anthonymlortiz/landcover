@@ -6,6 +6,12 @@ from torch.autograd import Variable
 from fusionnet import Fusionnet
 import json
 
+def softmax(output):
+    output_max = np.max(output, axis=2, keepdims=True)
+    exps = np.exp(output-output_max)
+    exp_sums = np.sum(exps, axis=2, keepdims=True)
+    return exps/exp_sums
+
 class GnPytorchModel(BackendModel):
 
     def __init__(self, model_fn, gpuid):
@@ -23,7 +29,7 @@ class GnPytorchModel(BackendModel):
         inf_framework.load_model(self.model_fn)
         y_hat = inf_framework.predict_entire_image_gammas(naip_tile, gammas, betas)
         output = y_hat[:, :, 1:5]
-        return output
+        return softmax(output)
 
 class InferenceFramework():
     def __init__(self, model, opts):
