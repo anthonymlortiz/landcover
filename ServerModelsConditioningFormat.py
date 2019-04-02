@@ -81,7 +81,8 @@ class InferenceFramework():
         betas[0, 8:16, 0, 0] = beta[1]
         betas[0, 16:24, 0, 0] = beta[2]
         betas[0, 24:32, 0, 0] = beta[3]
-
+        gammas =torch.Tensor(gammas).to('cuda')
+        betas = torch.Tensor(betas).to('cuda')
         out = out * gammas + betas
         out = self.model.out_2(out)
 
