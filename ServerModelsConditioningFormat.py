@@ -99,7 +99,7 @@ class InferenceFramework():
         x = x[:4, :, :]
         norm_image = x / 255.0
         _, w, h = norm_image.shape
-        out = np.zeros((4,w,h))
+        out = np.zeros((5,w,h))
         norm_image1 = norm_image[:, :w-(w%128), :h-(h%128)]
         norm_image2 = norm_image[:, (w % 128):w, (h % 128):h ]
         norm_image3 = norm_image[:, :w - (w % 128), (h % 128):h]
@@ -134,7 +134,7 @@ class InferenceFramework():
         norm_image = x / 255.0
         _, w, h = norm_image.shape
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        out = np.zeros((4,w,h))
+        out = np.zeros((5,w,h))
         norm_image1 = norm_image[:, :w-(w%128), :h-(h%128)]
         norm_image2 = norm_image[:, (w % 128):w, (h % 128):h ]
         norm_image3 = norm_image[:, :w - (w % 128), (h % 128):h]
