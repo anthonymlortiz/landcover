@@ -156,7 +156,7 @@ class InferenceFramework():
         out[:, (w % 128):w, (h % 128):h ] = y_hat2
         out[:, :w - (w % 128), (h % 128):h] = y_hat3
         out[:, (w % 128):w, :h - (h % 128)] = y_hat4
-        pred = np.rollaxis(out, 0, 2)
+        pred = np.rollaxis(out, 0, 3)
         print(pred.shape)
         return pred
 
