@@ -17,18 +17,13 @@ class GnPytorchModel(BackendModel):
     def run(self, naip_data, naip_fn, extent, buffer, gammas, betas):
         return self.run_model_on_tile(naip_data, gammas, betas), os.path.basename(self.model_fn)
 
-    def softmax(output):
-        output_max = np.max(output, axis=3, keepdims=True)
-        exps = np.exp(output - output_max)
-        exp_sums = np.sum(exps, axis=3, keepdims=True)
-        return exps / exp_sums
 
     def run_model_on_tile(self, naip_tile, gammas, betas, batch_size=32):
         inf_framework = InferenceFramework(Fusionnet, self.opts)
         inf_framework.load_model(self.model_fn)
         y_hat = inf_framework.predict_entire_image_gammas(naip_tile, gammas, betas)
         output = y_hat[:, :, 1:5]
-        return self.softmax(output, axis=2)
+        return np.argmax(output, axis=2)
 
 class InferenceFramework():
     def __init__(self, model, opts):
