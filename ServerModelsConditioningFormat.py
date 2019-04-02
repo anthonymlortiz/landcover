@@ -200,7 +200,7 @@ class InferenceFramework():
         """
         Activations to write for the duke U-net
         """
-        conditioning_info = self.conditioning_model.pre_pred(x)
+        conditioning_info = self.model.conditioning_model.pre_pred(x)
 
         cbn = self.model.fc_cbn(conditioning_info)
         gammas = cbn[:, :int(cbn.shape[1] / 2)]
