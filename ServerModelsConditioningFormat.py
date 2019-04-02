@@ -4,6 +4,7 @@ from ServerModelsAbstract import BackendModel
 import torch
 from torch.autograd import Variable
 from fusionnet import Fusionnet
+from conditional_superres_net import Conditional_superres_net
 import json
 
 def softmax(output):
@@ -179,7 +180,7 @@ class CondFusionnetModel(BackendModel):
         return self.run_model_on_tile(naip_data, gammas, betas), os.path.basename(self.model_fn)
 
     def run_model_on_tile(self, naip_tile, gammas, betas, batch_size=32):
-        inf_framework = InferenceFramework(Fusionnet, self.opts)
+        inf_framework = InferenceFramework(Conditional_superres_net, self.opts)
         inf_framework.load_model(self.model_fn)
         y_hat = inf_framework.predict_entire_image_gammas(naip_tile, gammas, betas)
         output = y_hat[:, :, 1:5]
