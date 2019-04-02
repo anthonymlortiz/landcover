@@ -23,7 +23,7 @@ class GnPytorchModel(BackendModel):
         inf_framework.load_model(self.model_fn)
         y_hat = inf_framework.predict_entire_image_gammas(naip_tile, gammas, betas)
         output = y_hat[:, :, 1:5]
-        return np.argmax(output, axis=2)
+        return output
 
 class InferenceFramework():
     def __init__(self, model, opts):
