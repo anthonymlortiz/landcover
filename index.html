@@ -249,6 +249,7 @@
                 </div>
                 <div style="text-align: center; margin-bottom:10px;" id="classConditioning">
                     <h3>Change group conditioning params</h3>
+
                     <table style="width:100%;">
                         <tr>
                             <td style="text-align: center;">Scaling Group 1</td>
@@ -306,7 +307,23 @@
                                 <input type="range" min="-2" max="2" value="0" step="0.05" class="slider" id="beta4Range">
                             </td>
                         </tr>
+                        <input onclick="resetFunc()" type="button" value="Reset Sliders">
+
                     </table>
+                    <script>
+                      function resetFunc(){
+                        document.getElementById("gamma1Range").value = 1;
+                        document.getElementById("gamma2Range").value = 1;
+                        document.getElementById("gamma3Range").value = 1;
+                        document.getElementById("gamma4Range").value = 1;
+                        document.getElementById("beta1Range").value = 0;
+                        document.getElementById("beta2Range").value = 0;
+                        document.getElementById("beta3Range").value = 0;
+                        document.getElementById("beta4Range").value = 0;
+
+                      }
+
+                    </script>
                 </div>
             </div>
             <!-- End of "home" tab -->
@@ -497,6 +514,8 @@
                     [bottomright.lat, bottomright.lng],
                     [bottomright.lat, topleft.lng]];
         };
+
+
        
         $(document).ready(function(){
 
@@ -536,6 +555,7 @@
                 $("#beta3Val"),
                 $("#beta4Val")
             ];
+
 
             //----------------------------------------------------------------------
             // Setup map layers
