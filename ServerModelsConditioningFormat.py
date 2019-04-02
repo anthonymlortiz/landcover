@@ -19,7 +19,7 @@ class GnPytorchModel(BackendModel):
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = str(gpuid)
         self.model_fn = model_fn
-        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_conditioning_groups/training/params.json", "r"))["model_opts"]
+        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_conditional_superres512/training/params.json", "r"))["model_opts"]
 
     def run(self, naip_data, naip_fn, extent, buffer, gammas, betas):
         return self.run_model_on_tile(naip_data, gammas, betas), os.path.basename(self.model_fn)
