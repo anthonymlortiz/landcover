@@ -313,31 +313,28 @@
                     <script>
                       function resetFunc(){
                         document.getElementById("gamma1Range").value = 1;
+                        document.getElementById("gamma1Val").html = 1;
                         document.getElementById("gamma2Range").value = 1;
+                        document.getElementById("gamma2Val").html = 1;
                         document.getElementById("gamma3Range").value = 1;
+                        document.getElementById("gamma3Val").html = 1;
                         document.getElementById("gamma4Range").value = 1;
+                        document.getElementById("gamma4Val").html = 1;
                         document.getElementById("beta1Range").value = 0;
+                        document.getElementById("beta1Val").html = 0;
                         document.getElementById("beta2Range").value = 0;
+                        document.getElementById("beta2Val").html = 0;
                         document.getElementById("beta3Range").value = 0;
+                        document.getElementById("beta3Val").html = 0;
                         document.getElementById("beta4Range").value = 0;
+                        document.getElementById("beta4Val").html = 0;
                         for(var j=0;j<gammas.length;j++){
-                            gammas[j] = 1;
-                        }
-
-                        for(var j=0;j<gammas.length;j++){
-                            var value = gammas[j];
-                            gammaRanges[j].val(value);
-                            gammaVals[j].html(value);
+                            gammas[j] = 1.0;
                         }
                         for(var j=0;j<betas.length;j++){
-                            betas[j] = 0;
+                            betas[j] = 0.0;
                         }
 
-                        for(var j=0;j<betas.length;j++){
-                            var value = betas[j];
-                            betaRanges[j].val(value);
-                            betaVals[j].html(value);
-                        }
 
                       }
 
