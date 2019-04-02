@@ -157,10 +157,10 @@ class InferenceFramework():
         _, w, h = norm_image.shape
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         out = np.zeros((5,w,h))
-        norm_image1 = norm_image[:, :w-(w%128), :h-(h%128)]
-        norm_image2 = norm_image[:, (w % 128):w, (h % 128):h ]
-        norm_image3 = norm_image[:, :w - (w % 128), (h % 128):h]
-        norm_image4 = norm_image[:, (w % 128):w, :h - (h % 128)]
+        norm_image1 = norm_image[:, :w-(w%240), :h-(h%240)]
+        norm_image2 = norm_image[:, (w % 240):w, (h % 240):h ]
+        norm_image3 = norm_image[:, :w - (w % 240), (h % 240):h]
+        norm_image4 = norm_image[:, (w % 240):w, :h - (h % 240)]
         x_c_tensor1 = torch.from_numpy(norm_image1).float().to(device)
         x_c_tensor2 = torch.from_numpy(norm_image2).float().to(device)
         x_c_tensor3 = torch.from_numpy(norm_image3).float().to(device)
@@ -173,10 +173,10 @@ class InferenceFramework():
         y_hat2 = (Variable(y_pred2).data).cpu().numpy()
         y_hat3 = (Variable(y_pred3).data).cpu().numpy()
         y_hat4 = (Variable(y_pred4).data).cpu().numpy()
-        out[:, :w - (w % 128), :h - (h % 128)] = y_hat1
-        out[:, (w % 128):w, (h % 128):h ] = y_hat2
-        out[:, :w - (w % 128), (h % 128):h] = y_hat3
-        out[:, (w % 128):w, :h - (h % 128)] = y_hat4
+        out[:, :w - (w % 240), :h - (h % 240)] = y_hat1
+        out[:, (w % 240):w, (h % 240):h ] = y_hat2
+        out[:, :w - (w % 240), (h % 240):h] = y_hat3
+        out[:, (w % 240):w, :h - (h % 240)] = y_hat4
         pred = np.rollaxis(out, 2, 1)
         print(pred.shape)
         pred = np.rollaxis(out, 0, 3)
@@ -194,10 +194,10 @@ class InferenceFramework():
         _, w, h = norm_image.shape
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         out = np.zeros((5,w,h))
-        norm_image1 = norm_image[:, :w-(w%128), :h-(h%128)]
-        norm_image2 = norm_image[:, (w % 128):w, (h % 128):h ]
-        norm_image3 = norm_image[:, :w - (w % 128), (h % 128):h]
-        norm_image4 = norm_image[:, (w % 128):w, :h - (h % 128)]
+        norm_image1 = norm_image[:, :w-(w%240), :h-(h%240)]
+        norm_image2 = norm_image[:, (w % 240):w, (h % 240):h ]
+        norm_image3 = norm_image[:, :w - (w % 240), (h % 240):h]
+        norm_image4 = norm_image[:, (w % 240):w, :h - (h % 240)]
         x_c_tensor1 = torch.from_numpy(norm_image1).float().to(device)
         x_c_tensor2 = torch.from_numpy(norm_image2).float().to(device)
         x_c_tensor3 = torch.from_numpy(norm_image3).float().to(device)
@@ -210,10 +210,10 @@ class InferenceFramework():
         y_hat2 = (Variable(y_pred2).data).cpu().numpy()
         y_hat3 = (Variable(y_pred3).data).cpu().numpy()
         y_hat4 = (Variable(y_pred4).data).cpu().numpy()
-        out[:, :w - (w % 128), :h - (h % 128)] = y_hat1
-        out[:, (w % 128):w, (h % 128):h ] = y_hat2
-        out[:, :w - (w % 128), (h % 128):h] = y_hat3
-        out[:, (w % 128):w, :h - (h % 128)] = y_hat4
+        out[:, :w - (w % 240), :h - (h % 240)] = y_hat1
+        out[:, (w % 240):w, (h % 240):h ] = y_hat2
+        out[:, :w - (w % 240), (h % 240):h] = y_hat3
+        out[:, (w % 240):w, :h - (h % 240)] = y_hat4
         pred = np.rollaxis(out, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
         print(pred.shape)
