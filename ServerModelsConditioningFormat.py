@@ -69,7 +69,6 @@ class InferenceFramework():
         skip_4 = (deconv_4 + down_1) / 2
         up_4 = self.model.up_4(skip_4)
 
-        out = self.model.out(up_4)
         gammas = np.zeros((1, 32, 1, 1))
         gammas[0, :8, 0, 0] = gamma[0]
         gammas[0, 8:16, 0, 0] = gamma[1]
@@ -81,9 +80,12 @@ class InferenceFramework():
         betas[0, 8:16, 0, 0] = beta[1]
         betas[0, 16:24, 0, 0] = beta[2]
         betas[0, 24:32, 0, 0] = beta[3]
-        gammas =torch.Tensor(gammas).to('cuda')
+        gammas = torch.Tensor(gammas).to('cuda')
         betas = torch.Tensor(betas).to('cuda')
-        out = out * gammas + betas
+        up_4 = up_4 * gammas + betas
+
+        out = self.model.out(up_4)
+
         out = self.model.out_2(out)
 
         return out
