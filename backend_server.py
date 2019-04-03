@@ -47,7 +47,7 @@ def pred_patch(model):
     weights = np.array(data["weights"], dtype=np.float32)
     gammas = np.array(data["gammas"], dtype=np.float32)
     betas = np.array(data["betas"], dtype=np.float32)
-    dropouts = np.array(data["dropouts"], dtype=np.float32)
+    filters2drop = np.array(data["filters2drop"], dtype=np.float32)
 
     # ------------------------------------------------------
     # Step 1
@@ -92,7 +92,7 @@ def pred_patch(model):
     # ------------------------------------------------------
     #output, name = ServerModels_Baseline_Blg_test.run_cnn(naip_data, landsat_data, blg_data, with_smooth=False)
     #name += "_with_smooth_False"
-    output, name = model.run(naip_data, naip_fn, extent, padding, gammas, betas, dropouts)
+    output, name = model.run(naip_data, naip_fn, extent, padding, gammas, betas, filters2drop)
     assert output.shape[2] == 4, "The model function should return an image shaped as (height, width, num_classes)"
     output *= weights[np.newaxis, np.newaxis, :] # multiply by the weight vector
     sum_vals = output.sum(axis=2) # need to normalize sums to 1 in order for the rendered output to be correct

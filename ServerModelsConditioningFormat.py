@@ -186,20 +186,8 @@ class InferenceFramework():
         betas[0, 16:24, 0, 0] = beta[2]
         betas[0, 24:32, 0, 0] = beta[3]
 
-        drop_idx1 = random.sample(range(0, 8), int(dropouts[0]))
-        drop_idx2 = random.sample(range(8, 16), int(dropouts[1]))
-        drop_idx3 = random.sample(range(16, 24), int(dropouts[2]))
-        drop_idx4 = random.sample(range(24, 32), int(dropouts[3]))
-        """
-        for id in drop_idx1:
-            gammas[0,id,0,0] = 0
-        for id in drop_idx2:
-            gammas[0,id,0,0] = 0
-        for id in drop_idx3:
-            gammas[0,id,0,0] = 0
-        for id in drop_idx4:
-            gammas[0,id,0,0] = 0
-            """
+        for id in dropouts:
+            gammas[0, id, 0, 0] = 0
         gammas = torch.Tensor(gammas).to('cuda')
         betas = torch.Tensor(betas).to('cuda')
         x = x * gammas + betas

@@ -428,6 +428,8 @@
         var betas = [0, 0, 0, 0];
 
         var dropouts = [0, 0, 0, 0];
+        var filters2drop = [];
+
 
         var requestPatches = function(polygon, weights_save, map){
 
@@ -504,7 +506,7 @@
                 "weights": weights_save,
                 "gammas": gammas,
                 "betas": betas,
-                "dropouts": dropouts,
+                "filters2drop": filters2drop,
             };
 
             $.ajax({
@@ -896,14 +898,39 @@
                 })
             }
 
+
+
             //----------------------------------------------------------------------
             // Setup dropout sliders
             //----------------------------------------------------------------------
-            var updateDropouts = function(){
 
+            function generateRandoms(min, max, numOfRandoms, unique){
+              /*min is the smallest possible generated number*/
+              /*max is the largest possible generated number*/
+              /*numOfRandoms is the number of random numbers to generate*/
+              /*unique is a boolean specifying whether the generated random numbers need to be unique*/
+                var getRandom = function(x, y){
+                  return Math.floor(Math.random() * (x - y + 1) + y);
+                }
+                var randoms = [];
+                while(randoms.length<numOfRandoms){
+                  var random = getRandom(min, max);
+                  if(randoms.indexOf(random)==-1||!unique){
+                    randoms.push(random);
+                  }
+                }
+                return randoms;
+}
+            var updateDropouts = function(){
+                filters2drop = [];
                 for(var j=0;j<dropouts.length;j++){
                     dropouts[j] = parseFloat(dropoutRanges[j].val()/100*8);
+
                 }
+                filters2drop.push(generateRandoms(0, 8, dropouts[0], true));
+                filters2drop.push(generateRandoms(8, 16, dropouts[1], true))
+                filters2drop.push(generateRandoms(16, 24, dropouts[2], true))
+                filters2drop.push(generateRandoms(24, 32, dropouts[3], true))
 
                 for(var j=0;j<dropouts.length;j++){
                     var value = Math.round((Math.round(dropouts[j]*100)/8),1);
