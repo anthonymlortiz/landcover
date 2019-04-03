@@ -926,7 +926,7 @@
             var updateDropouts = function(){
                 filters2drop = [];
                 for(var j=0;j<dropouts.length;j++){
-                    dropouts[j] = parseFloat(dropoutRanges[j].val()/100*8);
+                    dropouts[j] = parseInt(dropoutRanges[j].val()/100*8);
                 }
 
 
