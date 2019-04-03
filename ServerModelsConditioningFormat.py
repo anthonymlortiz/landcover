@@ -199,7 +199,7 @@ class InferenceFramework():
         betas = torch.Tensor(betas).to('cuda')
         x = x * gammas + betas
 
-        return self.conv_final(x)
+        return self.model.conv_final(x)
 
     def cond_fusionnet_gn_fun(self, x, gamma, beta, dropouts):
         """
