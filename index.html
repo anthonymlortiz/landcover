@@ -266,6 +266,13 @@
                             </td>
                         </tr>
                         <tr>
+                            <td style="text-align: center;">Dropout Group 1 (%)</td>
+                            <td style="width:30px;" id="dropout1Val">0</td>
+                            <td>
+                                <input type="range" min="0" max="100" value="0" step="12.5" class="slider" id="dropout1Range">
+                            </td>
+                        </tr>
+                        <tr>
                             <td style="text-align: center;">Scaling Group 2</td>
                             <td style="width:30px;" id="gamma2Val">1</td>
                             <td>
@@ -277,6 +284,13 @@
                             <td style="width:30px;" id="beta2Val">0</td>
                             <td>
                                 <input type="range" min="-2" max="2" value="0" step="0.05" class="slider" id="beta2Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Dropout Group 2 (%)</td>
+                            <td style="width:30px;" id="dropout2Val">0</td>
+                            <td>
+                                <input type="range" min="0" max="100" value="0" step="12.5" class="slider" id="dropout2Range">
                             </td>
                         </tr>
                         <tr>
@@ -294,6 +308,13 @@
                             </td>
                         </tr>
                         <tr>
+                            <td style="text-align: center;">Dropout Group 3 (%)</td>
+                            <td style="width:30px;" id="dropout3Val">0</td>
+                            <td>
+                                <input type="range" min="0" max="100" value="0" step="12.5" class="slider" id="dropout3Range">
+                            </td>
+                        </tr>
+                        <tr>
                             <td style="text-align: center;">Scaling Group 4</td>
                             <td style="width:30px;" id="gamma4Val">1</td>
                             <td>
@@ -305,6 +326,13 @@
                             <td style="width:30px;" id="beta4Val">0</td>
                             <td>
                                 <input type="range" min="-2" max="2" value="0" step="0.05" class="slider" id="beta4Range">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">Dropout Group 4 (%)</td>
+                            <td style="width:30px;" id="dropout4Val">0</td>
+                            <td>
+                                <input type="range" min="0" max="100" value="0" step="12.5" class="slider" id="dropout4Range">
                             </td>
                         </tr>
                         <input onclick="resetFunc()" type="button" value="Reset Sliders">
@@ -328,11 +356,22 @@
                         document.getElementById("beta3Val").html = 0;
                         document.getElementById("beta4Range").value = 0;
                         document.getElementById("beta4Val").html = 0;
+                        document.getElementById("dropout1Range").value = 0;
+                        document.getElementById("dropout1Val").html = 0;
+                        document.getElementById("dropout2Range").value = 0;
+                        document.getElementById("dropout2Val").html = 0;
+                        document.getElementById("dropout3Range").value = 0;
+                        document.getElementById("dropout3Val").html = 0;
+                        document.getElementById("dropout4Range").value = 0;
+                        document.getElementById("dropout4Val").html = 0;
                         for(var j=0;j<gammas.length;j++){
                             gammas[j] = 1.0;
                         }
                         for(var j=0;j<betas.length;j++){
                             betas[j] = 0.0;
+                        }
+                        for(var j=0;j<dropouts.length;j++){
+                            dropouts[j] = 0.0;
                         }
 
 
@@ -387,6 +426,8 @@
         var gammas = [1, 1, 1, 1];
 
         var betas = [0, 0, 0, 0];
+
+        var dropouts = [0, 0, 0, 0];
 
         var requestPatches = function(polygon, weights_save, map){
 
@@ -463,6 +504,7 @@
                 "weights": weights_save,
                 "gammas": gammas,
                 "betas": betas,
+                "dropouts": dropouts,
             };
 
             $.ajax({
@@ -569,6 +611,18 @@
                 $("#beta2Val"),
                 $("#beta3Val"),
                 $("#beta4Val")
+            ];
+            var dropoutRanges = [
+                $("#dropout1Range"),
+                $("#dropout2Range"),
+                $("#dropout3Range"),
+                $("#dropout4Range")
+            ];
+            var dropoutVals = [
+                $("#dropout1Val"),
+                $("#dropout2Val"),
+                $("#dropout3Val"),
+                $("#dropout4Val")
             ];
 
 
@@ -840,6 +894,28 @@
                 betaRanges[i].on("input", function () {
                     updateBetas();
                 })
+            }
+
+            //----------------------------------------------------------------------
+            // Setup dropout sliders
+            //----------------------------------------------------------------------
+            var updateDropouts = function(){
+
+                for(var j=0;j<dropouts.length;j++){
+                    dropouts[j] = parseFloat(dropoutRanges[j].val()/100*8);
+                }
+
+                for(var j=0;j<dropouts.length;j++){
+                    var value = Math.round((Math.round(dropouts[j]*100)/8),1);
+                    dropoutRanges[j].val(value);
+                    dropoutVals[j].html(value);
+                }
+            }
+
+            for(var i=0;i<dropoutRanges.length;i++){
+                dropoutRanges[i].on("input", function(){
+                    updateDropouts();
+                });
             }
 
 
