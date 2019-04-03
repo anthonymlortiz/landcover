@@ -5,5 +5,4 @@ MODEL_FN="/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn/training
 
 python -u backend_server.py \
     --model ${MODEL} \
-    --port ${PORT}\
     --model_fn ${MODEL_FN}
