@@ -70,7 +70,7 @@ class InferenceFramework():
         chips = []
         n = int(w/out_dim)
         for i in range(n-1):
-            for j in range(n)-1:
+            for j in range(n-1):
                 chips.append(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim])
 
         for i in range(n-1):
