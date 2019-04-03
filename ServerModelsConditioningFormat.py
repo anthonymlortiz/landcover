@@ -362,7 +362,7 @@ class InferenceFramework():
         norm_image_padded[3, :, :] = ir
         # print("norm image", norm_image_padded.shape)
 
-        x_chips = self.cunet_chip(norm_image_padded)
+        x_chips = self.cunet_chip(norm_image)
         y_hat_chips = []
         for x_c in x_chips:
             # 2636x2636
