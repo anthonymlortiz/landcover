@@ -920,7 +920,6 @@
                     randoms.push(random);
                   }
                 }
-                console.log(randoms);
                 return randoms;
             }
             var updateDropouts = function(){
@@ -928,8 +927,7 @@
                 for(var j=0;j<dropouts.length;j++){
                     dropouts[j] = parseInt(dropoutRanges[j].val()/100*8);
                 }
-                console.log(dropouts);
-                filters2drop.splice(0,filters2drop.length)
+                filters2drop.length =0
                 var rnd1 = generateRandoms(0, 8, dropouts[0], true)
                 filters2drop.concat(rnd1);
                 filters2drop.concat(generateRandoms(8, 16, dropouts[1], true));
