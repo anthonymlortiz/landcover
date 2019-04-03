@@ -256,7 +256,7 @@ class InferenceFramework():
 
         return out
 
-    def predict_entire_image(self, x):
+    def predict_entire_image_unet(self, x):
         x = np.swapaxes(x, 0, 2)
         x = np.swapaxes(x, 1, 2)
         if torch.cuda.is_available():
@@ -270,12 +270,14 @@ class InferenceFramework():
         r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
         g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
         b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
+        ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
 
         rw, rh = r.shape
         norm_image_padded = np.zeros((3, rw, rh))
         norm_image_padded[0, :, :] = r
         norm_image_padded[1, :, :] = g
         norm_image_padded[2, :, :] = b
+        norm_image_padded[3, :, :] = ir
         # print("norm image", norm_image_padded.shape)
 
         x_chips = self.cunet_chip(norm_image_padded)
@@ -347,12 +349,14 @@ class InferenceFramework():
         r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
         g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
         b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
+        ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
 
         rw, rh = r.shape
-        norm_image_padded = np.zeros((3, rw, rh))
+        norm_image_padded = np.zeros((4, rw, rh))
         norm_image_padded[0, :, :] = r
         norm_image_padded[1, :, :] = g
         norm_image_padded[2, :, :] = b
+        norm_image_padded[3, :, :] = ir
         # print("norm image", norm_image_padded.shape)
 
         x_chips = self.cunet_chip(norm_image_padded)
