@@ -367,7 +367,6 @@ class InferenceFramework():
             # 2452x2452
             # get predictions of size 2452x2452
             x_c_tensor1 = torch.from_numpy(x_c).float().to(device)
-            print((x_c_tensor1.shape))
             y_pred1 = self.unet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas, dropouts)
             y_hat1 = (Variable(y_pred1).data).cpu().numpy()
             y_hat_chips.append(y_hat1)
