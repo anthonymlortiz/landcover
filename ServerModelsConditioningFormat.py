@@ -344,6 +344,7 @@ class InferenceFramework():
         x = x[:4, :, :]
         norm_image = x / 255.0
         _, w, h = norm_image.shape
+        print(norm_image.shape)
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         out = np.zeros((5, w, h))
         r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
