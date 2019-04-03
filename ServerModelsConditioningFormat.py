@@ -84,7 +84,7 @@ class InferenceFramework():
 
     def cunet_stitch_mask(self, y_hat_c, w, h):
         [img_width, img_height] = [w, h]
-        mask = np.zeros([img_width, img_height])
+        mask = np.zeros([5, img_width, img_height])
         in_dim = 236
         out_dim = in_dim - 184
         n = int(w / out_dim)
