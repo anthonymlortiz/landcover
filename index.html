@@ -507,7 +507,7 @@
                 "weights": weights_save,
                 "gammas": gammas,
                 "betas": betas,
-                "filters2drop": dropouts,
+                "filters2drop": filters2drop,
             };
 
             $.ajax({
@@ -935,7 +935,8 @@
                     dropoutRanges[j].val(value);
                     dropoutVals[j].html(value);
                 }
-                filters2drop.concat(generateRandoms(0, 8, dropouts[0], true));
+                var rnd1 = generateRandoms(0, 8, dropouts[0], true)
+                filters2drop.concat(rnd1);
                 filters2drop.concat(generateRandoms(8, 16, dropouts[1], true));
                 filters2drop.concat(generateRandoms(16, 24, dropouts[2], true));
                 filters2drop.concat(generateRandoms(24, 32, dropouts[3], true));
