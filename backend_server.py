@@ -47,7 +47,8 @@ def pred_patch(model):
     weights = np.array(data["weights"], dtype=np.float32)
     gammas = np.array(data["gammas"], dtype=np.float32)
     betas = np.array(data["betas"], dtype=np.float32)
-    filters2drop = np.array(data["filters2drop"], dtype=np.float32)
+    print(data["filters2drop"])
+    filters2drop = np.array(data["filters2drop"], dtype=np.uint8)
 
     # ------------------------------------------------------
     # Step 1
