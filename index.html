@@ -927,10 +927,10 @@
                     dropouts[j] = parseFloat(dropoutRanges[j].val()/100*8);
 
                 }
-                filters2drop.push(generateRandoms(0, 8, dropouts[0], true));
-                filters2drop.push(generateRandoms(8, 16, dropouts[1], true))
-                filters2drop.push(generateRandoms(16, 24, dropouts[2], true))
-                filters2drop.push(generateRandoms(24, 32, dropouts[3], true))
+                filters2drop.concat(generateRandoms(0, 8, dropouts[0], true));
+                filters2drop.concat(generateRandoms(8, 16, dropouts[1], true))
+                filters2drop.concat(generateRandoms(16, 24, dropouts[2], true))
+                filters2drop.concat(generateRandoms(24, 32, dropouts[3], true))
 
                 for(var j=0;j<dropouts.length;j++){
                     var value = Math.round((Math.round(dropouts[j]*100)/8),1);
