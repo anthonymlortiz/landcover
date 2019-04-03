@@ -67,6 +67,7 @@ class InferenceFramework():
         _, w, h = x.shape
         in_dim = 604
         out_dim = in_dim - 184
+
         chips = []
         n = int((w-184)/out_dim)
         for i in range(n):
