@@ -68,7 +68,7 @@ class InferenceFramework():
         in_dim = 236
         out_dim = in_dim - 184
         chips = []
-        n = int(w/out_dim)
+        n = int((w-184)/out_dim)
         for i in range(n-1):
             for j in range(n-1):
                 chips.append(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim])
