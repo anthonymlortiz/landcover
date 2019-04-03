@@ -927,12 +927,13 @@
                 for(var j=0;j<dropouts.length;j++){
                     dropouts[j] = parseInt(dropoutRanges[j].val()/100*8);
                 }
-                filters2drop.length =0
-                var rnd1 = generateRandoms(0, 8, dropouts[0], true)
-                filters2drop.concat(rnd1);
-                filters2drop.concat(generateRandoms(8, 16, dropouts[1], true));
-                filters2drop.concat(generateRandoms(16, 24, dropouts[2], true));
-                filters2drop.concat(generateRandoms(24, 32, dropouts[3], true));
+
+                var newFilter = generateRandoms(0, 8, dropouts[0], true)
+                newFilter = newFilter.concat(generateRandoms(8, 16, dropouts[1], true));
+                newFilter = newFilter.concat(generateRandoms(16, 24, dropouts[2], true));
+                newFilter = newFilter.concat(generateRandoms(24, 32, dropouts[3], true));
+                filters2drop = newFilter
+
 
                 for(var j=0;j<dropouts.length;j++){
                     var value = Math.round((Math.round(dropouts[j]*100)/8),1);
