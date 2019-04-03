@@ -101,7 +101,7 @@ class InferenceFramework():
             mask[:,img_width - out_dim:, j * out_dim:(j + 1) * out_dim] = y_hat_c[quarter]
             quarter += 1
 
-        mask[:,img_width - out_dim:, img_height - out_dim:]
+        mask[:,img_width - out_dim:, img_height - out_dim:] = y_hat_c[quarter]
         return mask
 
     def fusionnet_gn_fun(self, x, gamma, beta):
