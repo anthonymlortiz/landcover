@@ -72,7 +72,7 @@ class InferenceFramework():
         for i in range(n):
             for j in range(n):
                 chips.append(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim])
-                chips.append(x[:, i * out_dim:i * out_dim + in_dim +92, j * out_dim:j * out_dim + in_dim +92])
+               # chips.append(x[:, i * out_dim:i * out_dim + in_dim +92, j * out_dim:j * out_dim + in_dim +92])
 
         for i in range(n):
             chips.append(x[:, i * out_dim:i * out_dim + in_dim:, h - in_dim:])
@@ -94,8 +94,8 @@ class InferenceFramework():
             for j in range(n):
                 mask[:,i * out_dim:(i + 1) * out_dim, j * out_dim:(j + 1) * out_dim] = y_hat_c[quarter]
                 quarter += 1
-                mask[:, i * out_dim:(i + 1) * out_dim+92, j * out_dim:(j + 1) * out_dim + 92] = y_hat_c[quarter]
-                quarter += 1
+             #   mask[:, i * out_dim:(i + 1) * out_dim+92, j * out_dim:(j + 1) * out_dim + 92] = y_hat_c[quarter]
+              #  quarter += 1
         for i in range(n):
             mask[:,i * out_dim:(i + 1) * out_dim, img_height - out_dim:] = y_hat_c[quarter]
             quarter += 1
