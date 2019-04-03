@@ -6,6 +6,7 @@ from torch.autograd import Variable
 from fusionnet import Fusionnet
 from unet import Unet
 import json
+import random
 
 def softmax(output):
     output_max = np.max(output, axis=2, keepdims=True)
@@ -21,14 +22,14 @@ class Fusionnet_gn_model(BackendModel):
         self.model_fn = model_fn
         self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_conditional_superres512/training/params.json", "r"))["model_opts"]
 
-    def run(self, naip_data, naip_fn, extent, buffer, gammas, betas):
-        return self.run_model_on_tile(naip_data, gammas, betas), os.path.basename(self.model_fn)
+    def run(self, naip_data, naip_fn, extent, buffer, gammas, betas, dropouts):
+        return self.run_model_on_tile(naip_data, gammas, betas, dropouts), os.path.basename(self.model_fn)
 
 
-    def run_model_on_tile(self, naip_tile, gammas, betas, batch_size=32):
+    def run_model_on_tile(self, naip_tile, gammas, betas, dropouts, batch_size=32):
         inf_framework = InferenceFramework(Fusionnet, self.opts)
         inf_framework.load_model(self.model_fn)
-        y_hat = inf_framework.predict_entire_image_gammas_fusionnet(naip_tile, gammas, betas)
+        y_hat = inf_framework.predict_entire_image_gammas_fusionnet(naip_tile, gammas, betas, dropouts)
         output = y_hat[:, :, 1:5]
         return softmax(output)
 
@@ -40,14 +41,14 @@ class Unet_gn_model(BackendModel):
         self.model_fn = model_fn
         self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn/training/params.json", "r"))["model_opts"]
 
-    def run(self, naip_data, naip_fn, extent, buffer, gammas, betas):
-        return self.run_model_on_tile(naip_data, gammas, betas), os.path.basename(self.model_fn)
+    def run(self, naip_data, naip_fn, extent, buffer, gammas, betas, dropouts):
+        return self.run_model_on_tile(naip_data, gammas, betas, dropouts), os.path.basename(self.model_fn)
 
 
-    def run_model_on_tile(self, naip_tile, gammas, betas, batch_size=32):
+    def run_model_on_tile(self, naip_tile, gammas, betas, dropouts, batch_size=32):
         inf_framework = InferenceFramework(Unet, self.opts)
         inf_framework.load_model(self.model_fn)
-        y_hat = inf_framework.predict_entire_image_gammas_unet(naip_tile, gammas, betas)
+        y_hat = inf_framework.predict_entire_image_gammas_unet(naip_tile, gammas, betas, dropouts)
         output = y_hat[:, :, 1:5]
         return softmax(output)
 
@@ -152,7 +153,7 @@ class InferenceFramework():
 
         return out
 
-    def unet_gn_fun(self, x, gamma, beta):
+    def unet_gn_fun(self, x, gamma, beta, dropouts):
         """
         Activations to write for the duke U-net
         """
@@ -181,13 +182,26 @@ class InferenceFramework():
         betas[0, 8:16, 0, 0] = beta[1]
         betas[0, 16:24, 0, 0] = beta[2]
         betas[0, 24:32, 0, 0] = beta[3]
+
+        drop_idx1 = random.sample(range(0, 8), int(dropouts[0]))
+        drop_idx2 = random.sample(range(8, 16), int(dropouts[1]))
+        drop_idx3 = random.sample(range(16, 24), int(dropouts[2]))
+        drop_idx4 = random.sample(range(24, 32), int(dropouts[3]))
+        for id in drop_idx1:
+            gammas[0,id,0,0] = 0
+        for id in drop_idx2:
+            gammas[0,id,0,0] = 0
+        for id in drop_idx3:
+            gammas[0,id,0,0] = 0
+        for id in drop_idx4:
+            gammas[0,id,0,0] = 0
         gammas = torch.Tensor(gammas).to('cuda')
         betas = torch.Tensor(betas).to('cuda')
         x = x * gammas + betas
 
         return self.conv_final(x)
 
-    def cond_fusionnet_gn_fun(self, x, gamma, beta):
+    def cond_fusionnet_gn_fun(self, x, gamma, beta, dropouts):
         """
         Activations to write for the duke U-net
         """
@@ -283,7 +297,7 @@ class InferenceFramework():
         pred = np.moveaxis(pred, 0, 1)
         return pred
 
-    def predict_entire_image_gammas_fusionnet(self, x, gammas, betas):
+    def predict_entire_image_gammas_fusionnet(self, x, gammas, betas, dropouts):
         x = np.swapaxes(x, 0, 2)
         x = np.swapaxes(x, 1, 2)
         if torch.cuda.is_available():
@@ -302,10 +316,10 @@ class InferenceFramework():
         x_c_tensor2 = torch.from_numpy(norm_image2).float().to(device)
         x_c_tensor3 = torch.from_numpy(norm_image3).float().to(device)
         x_c_tensor4 = torch.from_numpy(norm_image4).float().to(device)
-        y_pred1 = self.fusionnet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas)
-        y_pred2 = self.fusionnet_gn_fun(x_c_tensor2.unsqueeze(0), gammas, betas)
-        y_pred3 = self.fusionnet_gn_fun(x_c_tensor3.unsqueeze(0), gammas, betas)
-        y_pred4 = self.fusionnet_gn_fun(x_c_tensor4.unsqueeze(0), gammas, betas)
+        y_pred1 = self.fusionnet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas, dropouts)
+        y_pred2 = self.fusionnet_gn_fun(x_c_tensor2.unsqueeze(0), gammas, betas, dropouts)
+        y_pred3 = self.fusionnet_gn_fun(x_c_tensor3.unsqueeze(0), gammas, betas, dropouts)
+        y_pred4 = self.fusionnet_gn_fun(x_c_tensor4.unsqueeze(0), gammas, betas, dropouts)
         y_hat1 = (Variable(y_pred1).data).cpu().numpy()
         y_hat2 = (Variable(y_pred2).data).cpu().numpy()
         y_hat3 = (Variable(y_pred3).data).cpu().numpy()
@@ -319,7 +333,7 @@ class InferenceFramework():
         print(pred.shape)
         return pred
 
-    def predict_entire_image_gammas_unet(self, x, gammas, betas):
+    def predict_entire_image_gammas_unet(self, x, gammas, betas, dropouts):
         x = np.swapaxes(x, 0, 2)
         x = np.swapaxes(x, 1, 2)
         if torch.cuda.is_available():
@@ -348,7 +362,7 @@ class InferenceFramework():
             # 2452x2452
             # get predictions of size 2452x2452
             x_c_tensor1 = torch.from_numpy(x_c).float().to(device)
-            y_pred1 = self.unet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas)
+            y_pred1 = self.unet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas, dropouts)
             y_hat1 = (Variable(y_pred1).data).cpu().numpy()
             y_hat_chips.append(y_hat1)
         out = self.cunet_stitch_mask(
