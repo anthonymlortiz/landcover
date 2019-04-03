@@ -65,7 +65,7 @@ class InferenceFramework():
 
     def cunet_chip(self, x):
         _, w, h = x.shape
-        in_dim = 348
+        in_dim = 512
         out_dim = in_dim - 184
         chips = []
         n = int((w-184)/out_dim)
@@ -85,7 +85,7 @@ class InferenceFramework():
     def cunet_stitch_mask(self, y_hat_c, w, h):
         [img_width, img_height] = [w, h]
         mask = np.zeros([5, img_width, img_height])
-        in_dim = 348
+        in_dim = 512
         out_dim = in_dim - 184
         n = int(w / out_dim)
         quarter = 0
@@ -269,10 +269,10 @@ class InferenceFramework():
         _, w, h = norm_image.shape
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         out = np.zeros((5,w,h))
-        r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'constant', constant_values=((0, 0), (0, 0)))
-        g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'constant', constant_values=((0, 0), (0, 0)))
-        b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'constant', constant_values=((0, 0), (0, 0)))
-        ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'constant', constant_values=((0, 0), (0, 0)))
+        r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
+        g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
+        b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
+        ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
 
         rw, rh = r.shape
         norm_image_padded = np.zeros((3, rw, rh))
