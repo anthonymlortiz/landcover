@@ -75,6 +75,9 @@ class InferenceFramework():
 
         for j in range(n):
             chips.append(x[:, w - in_dim:, j * out_dim:j * out_dim + in_dim])
+
+        chips.append(x[:, w - in_dim:, h - in_dim:])
+
         for i in range(n):
             for j in range(n):
                 chips.append(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim])
@@ -82,7 +85,7 @@ class InferenceFramework():
 
 
 
-        chips.append(x[:, w - in_dim:, h - in_dim:])
+
         return chips
 
     def cunet_stitch_mask(self, y_hat_c, w, h):
@@ -99,6 +102,9 @@ class InferenceFramework():
         for j in range(n):
             mask[:,img_width - out_dim:, j * out_dim:(j + 1) * out_dim] = y_hat_c[quarter]
             quarter += 1
+
+        mask[:, img_width - out_dim:, img_height - out_dim:] = y_hat_c[quarter]
+
         for i in range(n):
             for j in range(n):
                 mask[:,i * out_dim:(i + 1) * out_dim, j * out_dim:(j + 1) * out_dim] = y_hat_c[quarter]
@@ -107,7 +113,7 @@ class InferenceFramework():
                 #quarter += 1
 
 
-        mask[:,img_width - out_dim:, img_height - out_dim:] = y_hat_c[quarter]
+
         return mask
 
     def fusionnet_gn_fun(self, x, gamma, beta):
