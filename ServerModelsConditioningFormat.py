@@ -65,7 +65,7 @@ class InferenceFramework():
 
     def cunet_chip(self, x):
         _, w, h = x.shape
-        in_dim = 348
+        in_dim = 572
         out_dim = in_dim - 184
 
         chips = []
@@ -96,7 +96,7 @@ class InferenceFramework():
         out = np.zeros([5, img_width, img_height])
         mask = np.zeros([5, img_width-184, img_height-184])
         [mask_width, mask_height]= [ img_width - 184, img_height - 184]
-        in_dim = 348
+        in_dim = 572
         out_dim = in_dim - 184
         n = int(w/out_dim)
         quarter = 0
