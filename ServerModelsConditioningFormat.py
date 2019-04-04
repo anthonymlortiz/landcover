@@ -74,7 +74,7 @@ class InferenceFramework():
         for i in range(n):
             for j in range(n):
                 chips.append(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim])
-                print(chips.shape)
+                print(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim].shape)
                 #chips.append(x[:, i * out_dim+92:i * out_dim + in_dim +92, j * out_dim+92:j * out_dim + in_dim +92])
         for i in range(n):
             chips.append(x[:, i * out_dim:i * out_dim + in_dim:, h - in_dim:])
