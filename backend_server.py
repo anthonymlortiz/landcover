@@ -149,6 +149,7 @@ def get_input():
     # ------------------------------------------------------
 
     naip_data, padding = DataLoader.get_data_by_extent(naip_fn, extent, DataLoader.GeoDataTypes.NAIP)
+    print("Padding: ", padding)
     naip_data = np.rollaxis(naip_data, 0, 3)
     naip_img = naip_data[:,:,:3].copy().astype(np.uint8) # keep the RGB channels to save as a color image later
     if padding > 0:
