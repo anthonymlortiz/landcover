@@ -69,17 +69,18 @@ class InferenceFramework():
         out_dim = in_dim - 184
 
         chips = []
-        n = int(math.floor(w/out_dim))
+        n = int(w/out_dim)
+        print("n", n)
 
-        for i in range(n):
-            for j in range(n):
+        for i in range(n-1):
+            for j in range(n-1):
                 chips.append(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim])
                 print(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim].shape)
                 #chips.append(x[:, i * out_dim+92:i * out_dim + in_dim +92, j * out_dim+92:j * out_dim + in_dim +92])
-        for i in range(n):
+        for i in range(n-1):
             chips.append(x[:, i * out_dim:i * out_dim + in_dim:, h - in_dim:])
 
-        for j in range(n):
+        for j in range(n-1):
             chips.append(x[:, w - in_dim:, j * out_dim:j * out_dim + in_dim])
 
 
@@ -96,20 +97,20 @@ class InferenceFramework():
         mask = np.zeros([5, img_width-184, img_height-184])
         in_dim = 604
         out_dim = in_dim - 184
-        n = int(math.floor(w/out_dim))
+        n = int(w/out_dim)
         quarter = 0
-        for i in range(n):
-            for j in range(n):
+        for i in range(n-1):
+            for j in range(n-1):
                 mask[:,i * out_dim:(i + 1) * out_dim, j * out_dim:(j + 1) * out_dim] = y_hat_c[quarter]
                 quarter += 1
                 #mask[:, i * out_dim+92:(i + 1) * out_dim+92, j * out_dim+92:(j + 1) * out_dim + 92] = y_hat_c[quarter]
                 #quarter += 1
 
-        for i in range(n):
+        for i in range(n-1):
             mask[:,i * out_dim:(i + 1) * out_dim, img_height - out_dim:] = y_hat_c[quarter]
             quarter += 1
 
-        for j in range(n):
+        for j in range(n-1):
             mask[:,img_width - out_dim:, j * out_dim:(j + 1) * out_dim] = y_hat_c[quarter]
             quarter += 1
 
