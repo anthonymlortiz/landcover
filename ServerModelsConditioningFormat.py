@@ -7,7 +7,7 @@ from fusionnet import Fusionnet
 from unet import Unet
 import json
 import random
-
+import math
 def softmax(output):
     output_max = np.max(output, axis=2, keepdims=True)
     exps = np.exp(output-output_max)
@@ -69,7 +69,7 @@ class InferenceFramework():
         out_dim = in_dim - 184
 
         chips = []
-        n = int((w)/out_dim)
+        n = int(math.floor(w/out_dim))
 
         for i in range(n):
             for j in range(n):
@@ -96,7 +96,7 @@ class InferenceFramework():
         mask = np.zeros([5, img_width-184, img_height-184])
         in_dim = 604
         out_dim = in_dim - 184
-        n = int(w / out_dim)
+        n = int(math.floor(w/out_dim))
         quarter = 0
         for i in range(n):
             for j in range(n):
