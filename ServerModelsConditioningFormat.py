@@ -95,6 +95,7 @@ class InferenceFramework():
 
         out = np.zeros([5, img_width, img_height])
         mask = np.zeros([5, img_width-184, img_height-184])
+        [mask_width, mask_height]= [ img_width - 184, img_height - 184]
         in_dim = 604
         out_dim = in_dim - 184
         n = int(w/out_dim)
@@ -107,14 +108,14 @@ class InferenceFramework():
                 #quarter += 1
 
         for i in range(n-1):
-            mask[:,i * out_dim:(i + 1) * out_dim, img_height - out_dim:] = y_hat_c[quarter]
+            mask[:,i * out_dim:(i + 1) * out_dim, mask_height - out_dim:] = y_hat_c[quarter]
             quarter += 1
 
         for j in range(n-1):
-            mask[:,img_width - out_dim:, j * out_dim:(j + 1) * out_dim] = y_hat_c[quarter]
+            mask[:,mask_width - out_dim:, j * out_dim:(j + 1) * out_dim] = y_hat_c[quarter]
             quarter += 1
 
-        mask[:, img_width - out_dim:, img_height - out_dim:] = y_hat_c[quarter]
+        mask[:, mask_width - out_dim:, mask_height - out_dim:] = y_hat_c[quarter]
         out[:,92:w-92,92:w-92] = mask
 
         return out
