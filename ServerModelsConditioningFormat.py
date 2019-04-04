@@ -120,7 +120,7 @@ class InferenceFramework():
 
         return out
 
-    def fusionnet_gn_fun(self, x, gamma, beta):
+    def fusionnet_gn_fun(self, x, gamma, beta, dropouts):
         """
         Activations to write for the duke U-net
         """
@@ -159,6 +159,8 @@ class InferenceFramework():
         betas[0, 8:16, 0, 0] = beta[1]
         betas[0, 16:24, 0, 0] = beta[2]
         betas[0, 24:32, 0, 0] = beta[3]
+        for id in dropouts:
+            gammas[0, id, 0, 0] = 0
         gammas = torch.Tensor(gammas).to('cuda')
         betas = torch.Tensor(betas).to('cuda')
         up_4 = up_4 * gammas + betas
