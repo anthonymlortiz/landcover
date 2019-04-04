@@ -69,7 +69,7 @@ class InferenceFramework():
         out_dim = in_dim - 184
 
         chips = []
-        n = int((w-184)/out_dim)
+        n = int((w)/out_dim)
 
         for i in range(n):
             for j in range(n):
@@ -90,7 +90,9 @@ class InferenceFramework():
 
     def cunet_stitch_mask(self, y_hat_c, w, h):
         [img_width, img_height] = [w, h]
-        mask = np.zeros([5, img_width, img_height])
+
+        out = np.zeros([5, img_width, img_height])
+        mask = np.zeros([5, img_width-184, img_height-184])
         in_dim = 604
         out_dim = in_dim - 184
         n = int(w / out_dim)
@@ -111,8 +113,9 @@ class InferenceFramework():
             quarter += 1
 
         mask[:, img_width - out_dim:, img_height - out_dim:] = y_hat_c[quarter]
+        out[:,92:w-92,92:w-92] = mask
 
-        return mask
+        return out
 
     def fusionnet_gn_fun(self, x, gamma, beta):
         """
@@ -347,20 +350,20 @@ class InferenceFramework():
         print(norm_image.shape)
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         out = np.zeros((5, w, h))
-        r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
-        g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
-        b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
-        ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
+       # r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
+       # g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
+      #  b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
+      #  ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
 
-        rw, rh = r.shape
-        norm_image_padded = np.zeros((4, rw, rh))
-        norm_image_padded[0, :, :] = r
-        norm_image_padded[1, :, :] = g
-        norm_image_padded[2, :, :] = b
-        norm_image_padded[3, :, :] = ir
+        #rw, rh = r.shape
+       # norm_image_padded = np.zeros((4, rw, rh))
+       # norm_image_padded[0, :, :] = r
+        #norm_image_padded[1, :, :] = g
+       # norm_image_padded[2, :, :] = b
+       # norm_image_padded[3, :, :] = ir
         # print("norm image", norm_image_padded.shape)
 
-        x_chips = self.cunet_chip(norm_image_padded)
+        x_chips = self.cunet_chip(norm_image)
         y_hat_chips = []
         for x_c in x_chips:
             # 2636x2636
