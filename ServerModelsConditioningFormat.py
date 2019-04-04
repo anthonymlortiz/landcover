@@ -116,7 +116,7 @@ class InferenceFramework():
             quarter += 1
 
         mask[:, mask_width - out_dim:, mask_height - out_dim:] = y_hat_c[quarter]
-        out[:,92:w-92,92:w-92] = mask
+        out[:,92:w-92,92:h-92] = mask
 
         return out
 
