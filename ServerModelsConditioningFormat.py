@@ -371,7 +371,7 @@ class InferenceFramework():
         x_c_tensor1 = torch.from_numpy(norm_image1).float().to(device)
         y_pred1 = self.unet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas, dropouts)
         y_hat1 = (Variable(y_pred1).data).cpu().numpy()
-        out[:, :w - (w % 892), :h - (h % 892)] = y_hat1
+        out[:, 92:w - (w % 892)-92, 92:h - (h % 892)-92] = y_hat1
         pred = np.rollaxis(out, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
         return pred
