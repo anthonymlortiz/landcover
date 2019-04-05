@@ -335,7 +335,7 @@ class InferenceFramework():
 
         batch = []
         batch_indices = []
-        print(len(batch_indices))
+
         batch_count = 0
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -346,6 +346,7 @@ class InferenceFramework():
                 batch.append(naip_im)
                 batch_indices.append((y_index, x_index))
                 batch_count += 1
+        print(batch_count)
         batch = torch.from_numpy(np.asarray(batch)).float().to(device)
         print(batch.shape)
         model_output = self.fusionnet_gn_fun(batch, gammas, betas, dropouts)
