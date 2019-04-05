@@ -366,36 +366,60 @@ class InferenceFramework():
 
 
     def predict_entire_image_gammas_unet(self, x, gammas, betas, dropouts):
+        print(x.shape)
         x = np.swapaxes(x, 0, 2)
         x = np.swapaxes(x, 1, 2)
         if torch.cuda.is_available():
             self.model.cuda()
         x = np.rollaxis(x, 2, 1)
         x = x[:4, :, :]
-        norm_image = x / 255.0
-        _, w, h = norm_image.shape
-        print(norm_image.shape)
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        out = np.zeros((5, w, h))
-       # r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
-       # g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
-      #  b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
-      #  ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
+        naip_tile = x / 255.0
 
-        #rw, rh = r.shape
-       # norm_image_padded = np.zeros((4, rw, rh))
-       # norm_image_padded[0, :, :] = r
-        #norm_image_padded[1, :, :] = g
-       # norm_image_padded[2, :, :] = b
-       # norm_image_padded[3, :, :] = ir
-        # print("norm image", norm_image_padded.shape)
-        norm_image1 = norm_image[:, 184:w - (w % 892)+184, 184:h - (h % 892)+184]
-        x_c_tensor1 = torch.from_numpy(norm_image1).float().to(device)
-        y_pred1 = self.unet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas, dropouts)
-        y_hat1 = (Variable(y_pred1).data).cpu().numpy()
-        out[:, 184+92:w - (w % 892)+92, 184+92:h - (h % 892)+92] = y_hat1
-        pred = np.rollaxis(out, 0, 3)
+        down_weight_padding = 42
+        height = naip_tile.shape[1]
+        width = naip_tile.shape[2]
+
+        stride_x = self.input_size - down_weight_padding * 2
+        stride_y = self.input_size - down_weight_padding * 2
+
+        output = np.zeros((self.output_channels, height, width), dtype=np.float32)
+        counts = np.zeros((height, width), dtype=np.float32) + 0.000000001
+        kernel = np.ones((self.input_size, self.input_size), dtype=np.float32) * 0.1
+        kernel[10:-10, 10:-10] = 1
+        kernel[down_weight_padding:down_weight_padding + stride_y,
+        down_weight_padding:down_weight_padding + stride_x] = 5
+
+        batch = []
+        batch_indices = []
+
+        batch_count = 0
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        for y_index in (list(range(0, height - self.input_size, stride_y)) + [height - self.input_size, ]):
+            for x_index in (list(range(0, width - self.input_size, stride_x)) + [width - self.input_size, ]):
+                naip_im = naip_tile[:, y_index:y_index + self.input_size, x_index:x_index + self.input_size]
+                batch.append(naip_im)
+                batch_indices.append((y_index, x_index))
+                batch_count += 1
+                print(batch_count)
+        batch_arr = np.zeros((batch_count, 4, self.input_size, self.input_size))
+        i = 0
+        for im in batch:
+            batch_arr[i, :, :, :] = im
+            i += 1
+        batch = torch.from_numpy(batch_arr).float().to(device)
+        model_output = self.unet_gn_fun(batch, gammas, betas, dropouts)
+        model_output = (Variable(model_output).data).cpu().numpy()
+        for i, (y, x) in enumerate(batch_indices):
+            output[:, y+92:y + self.input_size-92, x+92:x + self.input_size-92] += model_output[i] * kernel[np.newaxis, ...]
+            counts[y+92:y + self.input_size-92, x+92:x + self.input_size-92] += kernel
+
+        output = output / counts[np.newaxis, ...]
+        # output = output[1:5,:, :]
+        print(output.shape)
+        pred = np.rollaxis(output, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
+        print(pred.shape)
         return pred
 
 """
