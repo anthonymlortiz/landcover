@@ -317,7 +317,7 @@ class InferenceFramework():
         x = x[:4, :, :]
         naip_tile = x / 255.0
 
-        down_weight_padding = 40
+        down_weight_padding = 20
         height = naip_tile.shape[1]
         width = naip_tile.shape[2]
 
@@ -343,6 +343,7 @@ class InferenceFramework():
                 batch.append(naip_im)
                 batch_indices.append((y_index, x_index))
                 batch_count += 1
+                print(batch_count)
         batch_arr = np.zeros((batch_count, 4, self.input_size, self.input_size))
         i = 0
         for im in batch:
