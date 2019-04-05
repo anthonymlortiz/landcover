@@ -345,6 +345,7 @@ class InferenceFramework():
                 batch_indices.append((y_index, x_index))
                 batch_count += 1
         batch = torch.from_numpy(np.asarray(batch)).float().to(device)
+        print(batch.shape)
         model_output = self.fusionnet_gn_fun(batch, gammas, betas, dropouts)
         model_output = (Variable(model_output).data).cpu().numpy()
         for i, (y, x) in enumerate(batch_indices):
