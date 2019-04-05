@@ -317,7 +317,7 @@ class InferenceFramework():
         x = x[:4, :, :]
         naip_tile = x / 255.0
 
-        down_weight_padding = 40
+        down_weight_padding = 80
         height = naip_tile.shape[1]
         width = naip_tile.shape[2]
 
@@ -327,9 +327,9 @@ class InferenceFramework():
         output = np.zeros((self.output_channels, height, width), dtype=np.float32)
         counts = np.zeros((height, width), dtype=np.float32) + 0.000000001
         kernel = np.ones((self.input_size, self.input_size), dtype=np.float32) * 0.1
-        kernel[10:-10, 10:-10] = 1
+        kernel[20:-20, 20:-20] = 1
         kernel[down_weight_padding:down_weight_padding + stride_y,
-        down_weight_padding:down_weight_padding + stride_x] = 10
+        down_weight_padding:down_weight_padding + stride_x] = 5
 
         batch = []
         batch_indices = []
