@@ -387,8 +387,8 @@ class InferenceFramework():
         counts = np.zeros((height, width), dtype=np.float32) + 0.000000001
         kernel = np.ones((self.input_size, self.input_size), dtype=np.float32) * 0.1
         kernel[10:-10, 10:-10] = 1
-        kernel[down_weight_padding:down_weight_padding + stride_y,
-        down_weight_padding:down_weight_padding + stride_x] = 5
+        kernel[down_weight_padding+92:down_weight_padding + stride_y-92,
+        down_weight_padding+92:down_weight_padding + stride_x-92] = 5
 
         batch = []
         batch_indices = []
