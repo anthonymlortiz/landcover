@@ -358,7 +358,7 @@ class InferenceFramework():
         model_output = self.fusionnet_gn_fun(batch, gammas, betas, dropouts)
         model_output = (Variable(model_output).data).cpu().numpy()
         for i, (y, x) in enumerate(batch_indices):
-            output[y:y + self.input_size, x:x + self.input_size] += model_output[i] * kernel[..., np.newaxis]
+            output[y:y + self.input_size, x:x + self.input_size] += model_output[i] * kernel[np.newaxis, ...]
             counts[y:y + self.input_size, x:x + self.input_size] += kernel
 
         output = output / counts[..., np.newaxis]
