@@ -340,8 +340,6 @@ class InferenceFramework():
         for y_index in (list(range(0, height - self.input_size, stride_y)) + [height - self.input_size, ]):
             for x_index in (list(range(0, width - self.input_size, stride_x)) + [width - self.input_size, ]):
                 naip_im = naip_tile[:, y_index:y_index + self.input_size, x_index:x_index + self.input_size]
-                print(naip_im.shape)
-
                 batch.append(naip_im)
                 batch_indices.append((y_index, x_index))
                 batch_count += 1
@@ -358,7 +356,7 @@ class InferenceFramework():
             counts[y:y + self.input_size, x:x + self.input_size] += kernel
 
         output = output / counts[np.newaxis, ...]
-        output = output[1:5,:, :]
+        #output = output[1:5,:, :]
         print(output.shape)
         pred = np.rollaxis(output, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
