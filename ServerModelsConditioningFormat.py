@@ -347,7 +347,7 @@ class InferenceFramework():
                 batch.append(naip_im)
                 batch_indices.append((y_index, x_index))
                 batch_count += 1
-        batch_arr = np.zeros(batch_count, 4, self.input_size, self.input_size)
+        batch_arr = np.zeros((batch_count, 4, self.input_size, self.input_size))
         i = 0
         for im in batch:
             batch_arr[i,:,:,:] = im
