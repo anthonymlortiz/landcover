@@ -67,7 +67,7 @@ class InferenceFramework():
 
     def cunet_chip(self, x):
         _, w, h = x.shape
-        in_dim = 572
+        in_dim = 892
         out_dim = in_dim - 184
 
         chips = []
@@ -98,7 +98,7 @@ class InferenceFramework():
         out = np.zeros([5, img_width, img_height])
         mask = np.zeros([5, img_width-184, img_height-184])
         [mask_width, mask_height]= [ img_width - 184, img_height - 184]
-        in_dim = 572
+        in_dim = 892
         out_dim = in_dim - 184
         n = int(w/out_dim)
         quarter = 0
@@ -377,20 +377,29 @@ class InferenceFramework():
         print(norm_image.shape)
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         out = np.zeros((5, w, h))
-        r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
-        g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
-        b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
-        ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
+       # r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
+       # g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
+      #  b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
+      #  ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
 
-        rw, rh = r.shape
-        norm_image_padded = np.zeros((4, rw, rh))
-        norm_image_padded[0, :, :] = r
-        norm_image_padded[1, :, :] = g
-        norm_image_padded[2, :, :] = b
-        norm_image_padded[3, :, :] = ir
+        #rw, rh = r.shape
+       # norm_image_padded = np.zeros((4, rw, rh))
+       # norm_image_padded[0, :, :] = r
+        #norm_image_padded[1, :, :] = g
+       # norm_image_padded[2, :, :] = b
+       # norm_image_padded[3, :, :] = ir
         # print("norm image", norm_image_padded.shape)
+        norm_image1 = norm_image[:, 184:w - (w % 892)+184, 184:h - (h % 892)+184]
+        x_c_tensor1 = torch.from_numpy(norm_image1).float().to(device)
+        y_pred1 = self.unet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas, dropouts)
+        y_hat1 = (Variable(y_pred1).data).cpu().numpy()
+        out[:, 184+92:w - (w % 892)+92, 184+92:h - (h % 892)+92] = y_hat1
+        pred = np.rollaxis(out, 0, 3)
+        pred = np.moveaxis(pred, 0, 1)
+        return pred
 
-        x_chips = self.cunet_chip(norm_image_padded)
+"""
+        x_chips = self.cunet_chip(norm_image)
         y_hat_chips = []
         for x_c in x_chips:
             # 2636x2636
@@ -408,6 +417,7 @@ class InferenceFramework():
         pred = np.rollaxis(out, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
         return pred
+        """
 
 
 
