@@ -308,6 +308,7 @@ class InferenceFramework():
         return pred
 
     def predict_entire_image_gammas_fusionnet(self, x, gammas, betas, dropouts):
+        print(x.shape)
         x = np.swapaxes(x, 0, 2)
         x = np.swapaxes(x, 1, 2)
         if torch.cuda.is_available():
@@ -319,7 +320,6 @@ class InferenceFramework():
         down_weight_padding = 40
         height = naip_tile.shape[1]
         width = naip_tile.shape[2]
-        print("naip shape", naip_tile.shape)
 
         stride_x = self.input_size - down_weight_padding * 2
         stride_y = self.input_size - down_weight_padding * 2
@@ -350,18 +350,16 @@ class InferenceFramework():
         for im in batch:
             batch_arr[i,:,:,:] = im
             i+=1
-        print(batch_count)
         batch = torch.from_numpy(batch_arr).float().to(device)
-        print(batch.shape)
         model_output = self.fusionnet_gn_fun(batch, gammas, betas, dropouts)
         model_output = (Variable(model_output).data).cpu().numpy()
-        print(model_output.shape)
         for i, (y, x) in enumerate(batch_indices):
             output[:,y:y + self.input_size, x:x + self.input_size] += model_output[i] * kernel[np.newaxis, ...]
             counts[y:y + self.input_size, x:x + self.input_size] += kernel
 
         output = output / counts[np.newaxis, ...]
         output = output[1:5,:, :]
+        print(output.shape)
         pred = np.rollaxis(output, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
         print(pred.shape)
