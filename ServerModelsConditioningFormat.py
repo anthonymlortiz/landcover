@@ -329,7 +329,7 @@ class InferenceFramework():
         kernel = np.ones((self.input_size, self.input_size), dtype=np.float32) * 0.1
         kernel[10:-10, 10:-10] = 1
         kernel[down_weight_padding:down_weight_padding + stride_y,
-        down_weight_padding:down_weight_padding + stride_x] = 5
+        down_weight_padding:down_weight_padding + stride_x] = 10
 
         batch = []
         batch_indices = []
