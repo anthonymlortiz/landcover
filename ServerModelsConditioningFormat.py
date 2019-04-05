@@ -334,6 +334,7 @@ class InferenceFramework():
 
         batch = []
         batch_indices = []
+        print(len(batch_indices))
         batch_count = 0
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
