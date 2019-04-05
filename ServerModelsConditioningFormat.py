@@ -57,7 +57,7 @@ class InferenceFramework():
         self.opts = opts
         self.model = model(self.opts)
         self.output_channels = 5
-        self.input_size = 256
+        self.input_size = 512
 
 
     def load_model(self, path_2_saved_model):
