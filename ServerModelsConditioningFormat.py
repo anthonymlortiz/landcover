@@ -413,9 +413,9 @@ class InferenceFramework():
         model_output = (Variable(model_output).data).cpu().numpy()
         for i, (y, x) in enumerate(batch_indices):
             output[:, y+92:y + self.input_size-92, x+92:x + self.input_size-92] += model_output[i]
-            counts[y+92:y + self.input_size-92, x+92:x + self.input_size-92] += kernel[y+92:y + self.input_size-92, x+92:x + self.input_size-92]
+         #   counts[y+92:y + self.input_size-92, x+92:x + self.input_size-92] += kernel[y+92:y + self.input_size-92, x+92:x + self.input_size-92]
 
-        output = output / counts[np.newaxis, ...]
+       # output = output / counts[np.newaxis, ...]
         # output = output[1:5,:, :]
         print(output.shape)
         pred = np.rollaxis(output, 0, 3)
