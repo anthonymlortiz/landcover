@@ -169,7 +169,7 @@ class InferenceFramework():
 
         out = self.model.out(up_4)
 
-        out = self.model.out_2(out)
+        #out = self.model.out_2(out)
 
         return out
 
