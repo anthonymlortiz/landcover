@@ -56,6 +56,8 @@ class InferenceFramework():
     def __init__(self, model, opts):
         self.opts = opts
         self.model = model(self.opts)
+        self.output_channels = 5
+        self.input_size = 240
 
 
     def load_model(self, path_2_saved_model):
@@ -323,7 +325,7 @@ class InferenceFramework():
         stride_x = self.input_size - down_weight_padding * 2
         stride_y = self.input_size - down_weight_padding * 2
 
-        output = np.zeros((height, width, self.output_channels), dtype=np.float32)
+        output = np.zeros((self.output_channels, height, width), dtype=np.float32)
         counts = np.zeros((height, width), dtype=np.float32) + 0.000000001
         kernel = np.ones((self.input_size, self.input_size), dtype=np.float32) * 0.1
         kernel[10:-10, 10:-10] = 1
@@ -350,9 +352,9 @@ class InferenceFramework():
             counts[y:y + self.input_size, x:x + self.input_size] += kernel
 
         output = output / counts[..., np.newaxis]
-        output[:, :, 4] += output[:, :, 5]
-        output[:, :, 4] += output[:, :, 6]
-        output = output[:, :, 1:5]
+        output[4,:, :] += output[5,:, :]
+        output[4,:, :] += output[6,:, :]
+        output = output[1:5,:, :]
         output = np.rollaxis(output, 0, 3)
         output = np.moveaxis(output, 0, 1)
         return output
