@@ -347,9 +347,13 @@ class InferenceFramework():
                 batch.append(naip_im)
                 batch_indices.append((y_index, x_index))
                 batch_count += 1
-        #batch_arr =
+        batch_arr = np.zeros(batch_count, 4, self.input_size, self.input_size)
+        i = 0
+        for im in batch:
+            batch_arr[i,:,:,:] = im
+            i+=1
         print(batch_count)
-        batch = torch.from_numpy(np.asarray(batch)).float().to(device)
+        batch = torch.from_numpy(batch_arr).float().to(device)
         print(batch.shape)
         model_output = self.fusionnet_gn_fun(batch, gammas, betas, dropouts)
         model_output = (Variable(model_output).data).cpu().numpy()
