@@ -317,7 +317,7 @@ class InferenceFramework():
         x = x[:4, :, :]
         naip_tile = x / 255.0
 
-        down_weight_padding = 40
+        down_weight_padding = 50
         height = naip_tile.shape[1]
         width = naip_tile.shape[2]
 
