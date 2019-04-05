@@ -319,8 +319,8 @@ class InferenceFramework():
         naip_tile = x / 255.0
 
         down_weight_padding = 40
-        height = naip_tile.shape[0]
-        width = naip_tile.shape[1]
+        height = naip_tile.shape[1]
+        width = naip_tile.shape[2]
         print("naip shape", naip_tile.shape)
 
         stride_x = self.input_size - down_weight_padding * 2
