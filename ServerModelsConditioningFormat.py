@@ -387,8 +387,8 @@ class InferenceFramework():
         counts = np.zeros((height, width), dtype=np.float32) + 0.000000001
         kernel = np.ones((self.input_size, self.input_size), dtype=np.float32) * 0.1
         kernel[10:-10, 10:-10] = 1
-        kernel[down_weight_padding+92:down_weight_padding + stride_y-92,
-        down_weight_padding+92:down_weight_padding + stride_x-92] = 5
+        kernel[down_weight_padding:down_weight_padding + stride_y,
+        down_weight_padding:down_weight_padding + stride_x] = 5
 
         batch = []
         batch_indices = []
@@ -412,8 +412,8 @@ class InferenceFramework():
         model_output = self.unet_gn_fun(batch, gammas, betas, dropouts)
         model_output = (Variable(model_output).data).cpu().numpy()
         for i, (y, x) in enumerate(batch_indices):
-            output[:, y+92:y + self.input_size-92, x+92:x + self.input_size-92] += model_output[i] * kernel[np.newaxis, ...]
-            counts[y+92:y + self.input_size-92, x+92:x + self.input_size-92] += kernel
+            output[:, y+92:y + self.input_size-92, x+92:x + self.input_size-92] += model_output[i]
+            counts[y+92:y + self.input_size-92, x+92:x + self.input_size-92] += kernel[y+92:y + self.input_size-92, x+92:x + self.input_size-92]
 
         output = output / counts[np.newaxis, ...]
         # output = output[1:5,:, :]
