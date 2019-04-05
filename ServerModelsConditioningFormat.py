@@ -303,8 +303,6 @@ class InferenceFramework():
         out = self.cunet_stitch_mask(
             y_hat_chips,w,h
         )
-        pred = np.rollaxis(out, 2, 1)
-        print(pred.shape)
         pred = np.rollaxis(out, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
         return pred
@@ -364,9 +362,10 @@ class InferenceFramework():
 
         output = output / counts[np.newaxis, ...]
         output = output[1:5,:, :]
-        output = np.rollaxis(output, 0, 3)
-        output = np.moveaxis(output, 0, 1)
-        return output
+        pred = np.rollaxis(output, 0, 3)
+        pred = np.moveaxis(pred, 0, 1)
+        print(pred.shape)
+        return pred
 
 
     def predict_entire_image_gammas_unet(self, x, gammas, betas, dropouts):
