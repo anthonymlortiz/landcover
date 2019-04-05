@@ -361,7 +361,7 @@ class InferenceFramework():
             output[y:y + self.input_size, x:x + self.input_size] += model_output[i] * kernel[np.newaxis, ...]
             counts[y:y + self.input_size, x:x + self.input_size] += kernel
 
-        output = output / counts[..., np.newaxis]
+        output = output / counts[np.newaxis, ...]
         output[4,:, :] += output[5,:, :]
         output[4,:, :] += output[6,:, :]
         output = output[1:5,:, :]
