@@ -70,6 +70,7 @@ def pred_patch(model):
 
     naip_data, padding = DataLoader.get_data_by_extent(naip_fn, extent, DataLoader.GeoDataTypes.NAIP)
     naip_data = np.rollaxis(naip_data, 0, 3)
+    print("padding", padding)
     
     #landsat_data = DataLoader.get_landsat_by_extent(naip_fn, extent, padding)
     #landsat_data = np.rollaxis(landsat_data, 0, 3)

@@ -125,7 +125,8 @@ def get_data_by_extent(naip_fn, extent, geo_data_type):
 
     f = rasterio.open(fn, "r")
     geom = GeoTools.extent_to_transformed_geom(extent, f.crs["init"])
-    pad_rad = 15 # TODO: this might need to be changed for much larger inputs
+    print("extend",extent)
+    pad_rad = 260 # TODO: this might need to be changed for much larger inputs
     buffed_geom = shapely.geometry.shape(geom).buffer(pad_rad)
     minx, miny, maxx, maxy = buffed_geom.bounds
     geom = shapely.geometry.mapping(shapely.geometry.box(minx, miny, maxx, maxy, ccw=True))
