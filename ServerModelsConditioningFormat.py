@@ -367,6 +367,7 @@ class InferenceFramework():
 
     def predict_entire_image_gammas_unet(self, x, gammas, betas, dropouts):
         print(x.shape)
+        self.input_size = 236
         x = np.swapaxes(x, 0, 2)
         x = np.swapaxes(x, 1, 2)
         if torch.cuda.is_available():
