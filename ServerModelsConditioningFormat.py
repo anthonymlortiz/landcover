@@ -341,7 +341,7 @@ class InferenceFramework():
 
         for y_index in (list(range(0, height - self.input_size, stride_y)) + [height - self.input_size, ]):
             for x_index in (list(range(0, width - self.input_size, stride_x)) + [width - self.input_size, ]):
-                naip_im = naip_tile[y_index:y_index + self.input_size, x_index:x_index + self.input_size, :]
+                naip_im = naip_tile[:, y_index:y_index + self.input_size, x_index:x_index + self.input_size]
                 print(naip_im.shape)
 
                 batch.append(naip_im)
