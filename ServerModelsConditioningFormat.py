@@ -363,8 +363,6 @@ class InferenceFramework():
             counts[y:y + self.input_size, x:x + self.input_size] += kernel
 
         output = output / counts[np.newaxis, ...]
-        output[4,:, :] += output[5,:, :]
-        output[4,:, :] += output[6,:, :]
         output = output[1:5,:, :]
         output = np.rollaxis(output, 0, 3)
         output = np.moveaxis(output, 0, 1)
