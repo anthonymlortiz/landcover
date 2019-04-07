@@ -1,5 +1,8 @@
 import torch
 import torch.nn as nn
+from torch.nn import functional as F
+from torch.nn import init
+from torch.nn._jit_internal import weak_module, weak_script_method
 
 class Conv_residual_conv(nn.modules.Module):
 
@@ -171,9 +174,87 @@ class GroupNorm(nn.Module):
         mean = x.mean(-1, keepdim=True)
         var = x.var(-1, keepdim=True)
 
-       # x = (x-mean) / (var+self.eps).sqrt()
+        x = (x-mean) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
+
+class GroupNormRunningStats(nn.Module):
+    _version = 2
+    __constants__ = ['track_running_stats', 'momentum', 'eps', 'weight', 'bias',
+                     'running_mean', 'running_var', 'num_batches_tracked']
+    def __init__(self, num_features, channels_per_group=8, eps=1e-5, momentum=0.1, affine=True, track_running_stats = True):
+        super(GroupNorm, self).__init__()
+        self.weight = nn.Parameter(torch.ones(1,num_features,1,1))
+        self.bias = nn.Parameter(torch.zeros(1,num_features,1,1))
+        self.channels_per_group = channels_per_group
+        self.momentum = momentum
+        self.affine = affine
+        self.eps = eps
+        self.groups = int(channels_per_group / self.channels_per_group)
+        self.track_running_stats = track_running_stats
+        if self.track_running_stats:
+            self.register_buffer('running_mean', torch.zeros(self.groups))
+            self.register_buffer('running_var', torch.ones(self.groups))
+            self.register_buffer('num_batches_tracked', torch.tensor(0, dtype=torch.long))
+        else:
+            self.register_parameter('running_mean', None)
+            self.register_parameter('running_var', None)
+            self.register_parameter('num_batches_tracked', None)
+        self.reset_parameters()
+
+    def reset_running_stats(self):
+        if self.track_running_stats:
+            self.running_mean.zero_()
+            self.running_var.fill_(1)
+            self.num_batches_tracked.zero_()
+
+    def reset_parameters(self):
+        self.reset_running_stats()
+        if self.affine:
+            init.uniform_(self.weight)
+            init.zeros_(self.bias)
+
+    @weak_script_method
+    def forward(self, input):
+        N,C,H,W = input.size()
+        G = int(C/self.channels_per_group)
+        assert C % G == 0
+
+        if self.training and self.track_running_stats:
+            # TODO: if statement only here to tell the jit to skip emitting this when it is None
+            if self.num_batches_tracked is not None:
+                self.num_batches_tracked += 1
+                if self.momentum is None:  # use cumulative moving average
+                    exponential_average_factor = 1.0 / float(self.num_batches_tracked)
+                else:  # use exponential moving average
+                    exponential_average_factor = self.momentum
+
+        x = input.view(N,G,-1)
+        mean = x.mean(-1, keepdim=True)
+        var = x.var(-1, keepdim=True)
+
+        x = (x-mean) / (var+self.eps).sqrt()
+        x = x.view(N,C,H,W)
+        return x * self.weight + self.bias
+
+    def extra_repr(self):
+        return '{num_features}, eps={eps}, momentum={momentum}, affine={affine}, ' \
+               'track_running_stats={track_running_stats}'.format(**self.__dict__)
+
+    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
+                              missing_keys, unexpected_keys, error_msgs):
+        version = local_metadata.get('version', None)
+
+        if (version is None or version < 2) and self.track_running_stats:
+            # at version 2: added num_batches_tracked buffer
+            #               this should have a default value of 0
+            num_batches_tracked_key = prefix + 'num_batches_tracked'
+            if num_batches_tracked_key not in state_dict:
+                state_dict[num_batches_tracked_key] = torch.tensor(0, dtype=torch.long)
+
+        super(GroupNormRunningStats, self)._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict,
+            missing_keys, unexpected_keys, error_msgs)
 
 if __name__ == "__main__":
     # A full forward pass
