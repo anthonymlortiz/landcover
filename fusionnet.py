@@ -170,10 +170,8 @@ class GroupNorm(nn.Module):
         x = x.view(N,G,-1)
         mean = x.mean(-1, keepdim=True)
         var = x.var(-1, keepdim=True)
-        print("mean",mean.shape)
-        print("variance",var.shape)
 
-       # x = (x-mean) / (var+self.eps).sqrt()
+        x = (x-mean) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
 
