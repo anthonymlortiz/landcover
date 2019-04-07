@@ -133,7 +133,7 @@ def get_data_by_extent(naip_fn, extent, geo_data_type):
    # img, _ = rasterio.mask.mask(f, [geomb], crop=True)
    # _, r, _ = img.shape
 
-    pad_rad = 54 #TODO: this might need to be changed for much larger inputs
+    pad_rad = 300 #TODO: this might need to be changed for much larger inputs
    # pad_rad = int((890 - r)/2) #
     buffed_geom = shapely.geometry.shape(geom).buffer(pad_rad)
     minx, miny, maxx, maxy = buffed_geom.bounds
