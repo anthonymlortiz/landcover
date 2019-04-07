@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 class Conv_residual_conv(nn.modules.Module):
 
@@ -171,7 +172,11 @@ class GroupNorm(nn.Module):
         mean = x.mean(-1, keepdim=True)
         var = x.var(-1, keepdim=True)
 
-       # x = (x-mean) / (var+self.eps).sqrt()
+        mean = np.zeros(mean.shape)
+        var = np.ones(var.shape)
+        mean += 100
+
+        x = (x-mean) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
 
