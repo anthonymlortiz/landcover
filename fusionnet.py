@@ -170,6 +170,7 @@ class GroupNorm(nn.Module):
         x = x.view(N,G,-1)
         mean = x.mean(-1, keepdim=True)
         var = x.var(-1, keepdim=True)
+        print(var)
 
         x = (x) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
