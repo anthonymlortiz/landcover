@@ -178,18 +178,6 @@ class InferenceFramework():
         Activations to write for the duke U-net
         """
         x, conv1_out, conv1_dim = self.model.down_1(x)
-        x, conv2_out, conv2_dim = self.model.down_2(x)
-        x, conv3_out, conv3_dim = self.model.down_3(x)
-        x, conv4_out, conv4_dim = self.model.down_4(x)
-
-        # Bottleneck
-        x = self.model.conv5_block(x)
-
-        # up layers
-        x = self.model.up_1(x, conv4_out, conv4_dim)
-        x = self.model.up_2(x, conv3_out, conv3_dim)
-        x = self.model.up_3(x, conv2_out, conv2_dim)
-        x = self.model.up_4(x, conv1_out, conv1_dim)
 
         gammas = np.zeros((1, 32, 1, 1))
         gammas[0, :8, 0, 0] = gamma[0]
@@ -208,6 +196,21 @@ class InferenceFramework():
         gammas = torch.Tensor(gammas).to('cuda')
         betas = torch.Tensor(betas).to('cuda')
         x = x * gammas + betas
+
+        x, conv2_out, conv2_dim = self.model.down_2(x)
+        x, conv3_out, conv3_dim = self.model.down_3(x)
+        x, conv4_out, conv4_dim = self.model.down_4(x)
+
+        # Bottleneck
+        x = self.model.conv5_block(x)
+
+        # up layers
+        x = self.model.up_1(x, conv4_out, conv4_dim)
+        x = self.model.up_2(x, conv3_out, conv3_dim)
+        x = self.model.up_3(x, conv2_out, conv2_dim)
+        x = self.model.up_4(x, conv1_out, conv1_dim)
+
+
 
         return self.model.conv_final(x)
 
