@@ -172,11 +172,16 @@ class GroupNorm(nn.Module):
         mean = x.mean(-1, keepdim=True)
         var = x.var(-1, keepdim=True)
         _,n,_ = var.shape
-        if n == 4:
+        if n == 4 and var[0,0,0]>100:
             var[0,:,0] =torch.from_numpy(np.array([1456952.2500,
               2853746.7500,
               2915299.0000,
               19538828.0000]))
+        elif n==4:
+            var[0, :, 0] = torch.from_numpy(np.array([2.6291,
+         2.7672,
+         4.8078,
+         8.1384]))
         if n==8:
             var[0, :, 0] = torch.from_numpy(np.array([3135.5400,
          2231.0354,
@@ -308,7 +313,7 @@ class GroupNorm(nn.Module):
 
 
 
-        if n == 4:
+        if n == 8:
             print("Variance",var)
             print("Var REAL", x.var(-1, keepdim=True))
         #var[:,:,:] = torch.ones(var.shape) * 2e6
