@@ -171,6 +171,7 @@ class GroupNorm(nn.Module):
         mean = x.mean(-1, keepdim=True)
         var = x.var(-1, keepdim=True)
         print(var)
+        var = 10000
 
         x = (x) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
