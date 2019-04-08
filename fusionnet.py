@@ -177,7 +177,7 @@ class GroupNorm(nn.Module):
        # x = (x-mean) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
-
+"""
 class GroupNormRunningStats(nn.Module):
     _version = 2
     __constants__ = ['track_running_stats', 'momentum', 'eps', 'weight', 'bias',
@@ -255,6 +255,7 @@ class GroupNormRunningStats(nn.Module):
         super(GroupNormRunningStats, self)._load_from_state_dict(
             state_dict, prefix, local_metadata, strict,
             missing_keys, unexpected_keys, error_msgs)
+            """
 
 if __name__ == "__main__":
     # A full forward pass
