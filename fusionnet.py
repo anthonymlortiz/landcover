@@ -171,6 +171,8 @@ class GroupNorm(nn.Module):
         x = x.view(N,G,-1)
         mean = x.mean(-1, keepdim=True)
         var = x.var(-1, keepdim=True)
+
+        """
         _,n,_ = var.shape
         if n == 4 and var[0,0,0]>100:
             var[0,:,0] =torch.from_numpy(np.array([3808.6565,
@@ -379,8 +381,8 @@ class GroupNorm(nn.Module):
             print("Variance",var)
             print("Var REAL", x.var(-1, keepdim=True))
         #var[:,:,:] = torch.ones(var.shape) * 2e6
-
-        x = (x) / (var+self.eps).sqrt()
+"""
+        x = (x-mean) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
 """
