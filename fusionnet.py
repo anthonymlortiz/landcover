@@ -310,7 +310,7 @@ class GroupNorm(nn.Module):
 
         if n == 4:
             print("Variance",var)
-            print("Var shape", var.shape)
+            print("Var REAL", x.var(-1, keepdim=True))
         #var[:,:,:] = torch.ones(var.shape) * 2e6
 
         x = (x) / (var+self.eps).sqrt()
