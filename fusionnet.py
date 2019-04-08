@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 class Conv_residual_conv(nn.modules.Module):
 
@@ -172,10 +173,10 @@ class GroupNorm(nn.Module):
         var = x.var(-1, keepdim=True)
         _,n,_ = var.shape
         if n == 4:
-            var[0,:,0] =torch.from_numpy([1456952.2500,
+            var[0,:,0] =torch.from_numpy(np.array([1456952.2500,
               2853746.7500,
               2915299.0000,
-              19538828.0000])
+              19538828.0000]))
         print("Variance",var)
         print("Var shape", var.shape)
         #var[:,:,:] = torch.ones(var.shape) * 2e6
