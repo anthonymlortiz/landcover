@@ -308,9 +308,9 @@ class GroupNorm(nn.Module):
 
 
 
-        #if n == 64:
-            #print("Variance",var)
-        print("Var shape", var.shape)
+        if n == 4:
+            print("Variance",var)
+            print("Var shape", var.shape)
         #var[:,:,:] = torch.ones(var.shape) * 2e6
 
         x = (x) / (var+self.eps).sqrt()
