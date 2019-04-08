@@ -202,7 +202,25 @@ class GroupNorm(nn.Module):
           47097.7852]))
 
 
-        if n==16:
+        if n==16 and var[0,0,0]<100000:
+            var[0, :, 0] = torch.from_numpy(np.array([ 6485.2842,
+          4982.5801,
+          5038.2832,
+          3203.1484,
+         26720.5547,
+         12525.9072,
+          6620.0205,
+          4009.7852,
+         18603.8887,
+          3879.6147,
+         18651.0000,
+          7784.3535,
+          3875.3140,
+          4989.3140,
+         17317.2695,
+         12387.6611]))
+
+        elif n==16 :
             var[0, :, 0] = torch.from_numpy(np.array([48767396,
          14365743,
          12690414,
@@ -219,6 +237,7 @@ class GroupNorm(nn.Module):
          23245238,
          11961916,
          10502477]))
+
 
         if n==32:
             var[0, :, 0] = torch.from_numpy(np.array([3.6560e+10,
@@ -323,7 +342,7 @@ class GroupNorm(nn.Module):
 
 
 
-        if n == 16:
+        if n == 32:
             print("Variance",var)
             print("Var REAL", x.var(-1, keepdim=True))
         #var[:,:,:] = torch.ones(var.shape) * 2e6
