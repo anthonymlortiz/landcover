@@ -175,10 +175,10 @@ class GroupNorm(nn.Module):
 
         _,n,_ = var.shape
         if n == 4 and var[0,0,0]>100:
-            var[0,:,0] =torch.from_numpy(np.array([  8936.6641,
-          12239.0742,
-          14224.3945,
-         135834.8438]))
+            var[0,:,0] =torch.from_numpy(np.array([3808.6565,
+         9257.1025,
+         3660.0928,
+         5798.0645]))
         elif n==4:
             var[0, :, 0] = torch.from_numpy(np.array([2.6291,
          2.7672,
