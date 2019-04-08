@@ -170,7 +170,8 @@ class GroupNorm(nn.Module):
         x = x.view(N,G,-1)
         mean = x.mean(-1, keepdim=True)
         var = x.var(-1, keepdim=True)
-        print(var)
+        print("Variance",var)
+        print("Var shape", var.shape)
         var[:,:,:] = torch.ones(var.shape) * 2e6
 
         x = (x) / (var+self.eps).sqrt()
