@@ -179,19 +179,11 @@ class GroupNorm(nn.Module):
          9257.1025,
          3660.0928,
          5798.0645]))
-            mean[0,:,0] = torch.from_numpy(np.array([-0.6400,
-          1.7646,
-         -2.9623,
-         -0.3805]))
         elif n==4:
             var[0, :, 0] = torch.from_numpy(np.array([2.6291,
          2.7672,
          4.8078,
          8.1384]))
-            mean[0, :, 0] = torch.from_numpy(np.array([ 53994.6094,
-         154159.4531,
-          27400.8184,
-          69997.6562]))
         if n==8 and var[0,0,0]<10000:
             var[0, :, 0] = torch.from_numpy(np.array([3135.5400,
          2231.0354,
@@ -382,7 +374,7 @@ class GroupNorm(nn.Module):
          16401916,
          25546240]))
 
-        if n == 8:
+        if n == 16:
             print("Mean",mean)
             print("Var REAL", x.var(-1, keepdim=True))
         #var[:,:,:] = torch.ones(var.shape) * 2e6
