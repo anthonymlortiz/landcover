@@ -173,6 +173,10 @@ class GroupNorm(nn.Module):
         var = x.var(-1, keepdim=True)
         x = (x-mean) / (var + self.eps).sqrt()
         x = x.view(N, C, H, W)
+        _, n, _ = var.shape
+        if n == 4:
+            # print("Mean",mean)
+            print("Var REAL", x.var(-1, keepdim=True))
         return x * self.weight + self.bias
 
 """
@@ -378,7 +382,7 @@ class GroupNorm(nn.Module):
          25546240]))
 
         if n == 4:
-            print("Mean",mean)
+           # print("Mean",mean)
             print("Var REAL", x.var(-1, keepdim=True))
         #var[:,:,:] = torch.ones(var.shape) * 2e6
 """
