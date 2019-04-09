@@ -175,9 +175,9 @@ class GroupNorm(nn.Module):
         x = x.view(N, C, H, W)
         _, n, _ = var.shape
         print(var.shape)
-        if n == 4:
+        #if n == 4:
             # print("Mean",mean)
-            print("Var REAL", x.var(-1, keepdim=True))
+           # print("Var REAL", x.var(-1, keepdim=True))
         return x * self.weight + self.bias
 
 """
