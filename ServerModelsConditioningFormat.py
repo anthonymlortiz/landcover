@@ -72,7 +72,6 @@ class InferenceFramework():
 
         chips = []
         n = int(w/out_dim)
-        print("n", n)
 
         for i in range(n-1):
             for j in range(n-1):
@@ -311,7 +310,6 @@ class InferenceFramework():
         return pred
 
     def predict_entire_image_gammas_fusionnet(self, x, gammas, betas, dropouts):
-        print(x.shape)
         x = np.swapaxes(x, 0, 2)
         x = np.swapaxes(x, 1, 2)
         if torch.cuda.is_available():
@@ -346,7 +344,6 @@ class InferenceFramework():
                 batch.append(naip_im)
                 batch_indices.append((y_index, x_index))
                 batch_count += 1
-                print(batch_count)
         batch_arr = np.zeros((batch_count, 4, self.input_size, self.input_size))
         i = 0
         for im in batch:
@@ -361,10 +358,8 @@ class InferenceFramework():
 
         output = output / counts[np.newaxis, ...]
         #output = output[1:5,:, :]
-        print(output.shape)
         pred = np.rollaxis(output, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
-        print(pred.shape)
         return pred
 
 
