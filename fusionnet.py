@@ -174,7 +174,7 @@ class GroupNorm(nn.Module):
         x = (x-mean) / (var + self.eps).sqrt()
         x = x.view(N, C, H, W)
         _, n, _ = var.shape
-        print(var.shape)
+       # print(var.shape)
         #if n == 4:
             # print("Mean",mean)
            # print("Var REAL", x.var(-1, keepdim=True))
