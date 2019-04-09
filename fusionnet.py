@@ -184,7 +184,7 @@ class GroupNorm(nn.Module):
          2.7672,
          4.8078,
          8.1384]))
-        if n==8 and var[0,0,0]<10000:
+        if n==8 and var[0,0,0]<5000:
             var[0, :, 0] = torch.from_numpy(np.array([3135.5400,
          2231.0354,
           939.4938,
