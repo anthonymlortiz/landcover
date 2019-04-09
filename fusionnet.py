@@ -250,7 +250,7 @@ class GroupNorm(nn.Module):
           488262.0938]))
 
 
-        if n==32 and var[0,0,0]<3000000:
+        if n==32 and var[0,0,0]<10000000:
             var[0, :, 0] = torch.from_numpy(np.array([1127342.8750,
           582421.5625,
           417171.0625,
