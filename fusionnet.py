@@ -383,7 +383,7 @@ class GroupNorm(nn.Module):
          245793.0000,
          143726.0625]))
 
-        if n == 32:
+        if n == 64:
             print("Variance",var)
             print("Var REAL", x.var(-1, keepdim=True))
         #var[:,:,:] = torch.ones(var.shape) * 2e6
