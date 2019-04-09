@@ -213,7 +213,7 @@ class GroupNorm(nn.Module):
          18560.7734]))
 
 
-        if n==16 and var[0,0,0]<100000:
+        if n==16 and var[0,0,0]<50000:
             var[0, :, 0] = torch.from_numpy(np.array([ 6485.2842,
           4982.5801,
           5038.2832,
@@ -383,7 +383,7 @@ class GroupNorm(nn.Module):
          245793.0000,
          143726.0625]))
 
-        if n == 16:
+        if n == 32:
             print("Variance",var)
             print("Var REAL", x.var(-1, keepdim=True))
         #var[:,:,:] = torch.ones(var.shape) * 2e6
