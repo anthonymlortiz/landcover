@@ -7,7 +7,7 @@ def group_norm(input, group, running_mean, running_var, weight=None, bias=None,
     r"""Applies Group Normalization for channels in the same group in each data sample in a
     batch.
     See :class:`~torch.nn.GroupNorm1d`, :class:`~torch.nn.GroupNorm2d`,
-    :class:`~torch.nn.GroupNorm3d` for details.
+    :class:`~torch.nn.GroupNorm3d` for details.cxlv
     """
     if not use_input_stats and (running_mean is None or running_var is None):
         raise ValueError('Expected running_mean and running_var to be not None when use_input_stats=False')
