@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from torch.nn.modules.batchnorm import _BatchNorm
 
 def group_norm(input, group, running_mean, running_var, weight=None, bias=None,
-                  use_input_stats=True, momentum=0.1, eps=1e-5):
+                  use_input_stats=False, momentum=0.1, eps=1e-5):
     r"""Applies Group Normalization for channels in the same group in each data sample in a
     batch.
     See :class:`~torch.nn.GroupNorm1d`, :class:`~torch.nn.GroupNorm2d`,
