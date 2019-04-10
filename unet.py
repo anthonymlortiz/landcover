@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import json
 import os
-from fusionnet import GroupNorm
+from group_norm import GroupNorm2d
 
 class Down(nn.Module):
     """
@@ -96,7 +96,7 @@ class Unet(nn.Module):
                 nn.ReLU(inplace=True),
                 nn.Conv2d(dim_out, dim_out, kernel_size=kernel_size, stride=stride, padding=padding, bias=bias),
                 #FIXME add num_groups as hyper param on json
-                GroupNorm(dim_out),
+                GroupNorm2d(dim_out, num_groups=4, affine=True, track_running_stats=True),
                 nn.ReLU(inplace=True),
             )
         else:

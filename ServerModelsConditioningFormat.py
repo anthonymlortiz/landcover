@@ -2,6 +2,7 @@ import numpy as np
 import os
 from ServerModelsAbstract import BackendModel
 import torch
+import torch.nn as nn
 from torch.autograd import Variable
 from fusionnet import Fusionnet
 from unet import Unet
@@ -13,6 +14,7 @@ def softmax(output):
     exps = np.exp(output-output_max)
     exp_sums = np.sum(exps, axis=2, keepdims=True)
     return exps/exp_sums
+
 
 class Fusionnet_gn_model(BackendModel):
 
@@ -39,7 +41,7 @@ class Unet_gn_model(BackendModel):
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = str(gpuid)
         self.model_fn = model_fn
-        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn/training/params.json", "r"))["model_opts"]
+        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_runningstats4/training/params.json", "r"))["model_opts"]
 
     def run(self, naip_data, naip_fn, extent, buffer, gammas, betas, dropouts):
         return self.run_model_on_tile(naip_data, gammas, betas, dropouts), os.path.basename(self.model_fn)
@@ -77,7 +79,6 @@ class InferenceFramework():
             for j in range(n-1):
                 chips.append(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim])
                 print(x[:, i * out_dim:i * out_dim + in_dim, j * out_dim:j * out_dim + in_dim].shape)
-                #chips.append(x[:, i * out_dim+92:i * out_dim + in_dim +92, j * out_dim+92:j * out_dim + in_dim +92])
         for i in range(n-1):
             chips.append(x[:, i * out_dim:i * out_dim + in_dim:, h - in_dim:])
 
@@ -295,9 +296,6 @@ class InferenceFramework():
         x_chips = self.cunet_chip(norm_image_padded)
         y_hat_chips = []
         for x_c in x_chips:
-            #2636x2636
-            #2452x2452
-            #get predictions of size 2452x2452
             x_c_tensor1 = torch.from_numpy(x_c).float().to(device)
             y_pred1 = self.model.forward(x_c_tensor1.unsqueeze(0))
             y_hat1 = (Variable(y_pred1).data).cpu().numpy()
@@ -357,7 +355,6 @@ class InferenceFramework():
             counts[y:y + self.input_size, x:x + self.input_size] += kernel
 
         output = output / counts[np.newaxis, ...]
-        #output = output[1:5,:, :]
         pred = np.rollaxis(output, 0, 3)
         pred = np.moveaxis(pred, 0, 1)
         return pred
@@ -374,18 +371,7 @@ class InferenceFramework():
         _, w, h = norm_image.shape
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         out = np.zeros((5, w, h))
-       # r = np.pad(norm_image[0, :, :], ((92, 92), (92, 92)), 'reflect')
-       # g = np.pad(norm_image[1, :, :], ((92, 92), (92, 92)), 'reflect')
-      #  b = np.pad(norm_image[2, :, :], ((92, 92), (92, 92)), 'reflect')
-      #  ir = np.pad(norm_image[3, :, :], ((92, 92), (92, 92)), 'reflect')
 
-        #rw, rh = r.shape
-       # norm_image_padded = np.zeros((4, rw, rh))
-       # norm_image_padded[0, :, :] = r
-        #norm_image_padded[1, :, :] = g
-       # norm_image_padded[2, :, :] = b
-       # norm_image_padded[3, :, :] = ir
-        # print("norm image", norm_image_padded.shape)
         norm_image1 = norm_image[:, 130:w - (w % 892)+130, 130:h - (h % 892)+130]
         x_c_tensor1 = torch.from_numpy(norm_image1).float().to(device)
         y_pred1 = self.unet_gn_fun(x_c_tensor1.unsqueeze(0), gammas, betas, dropouts)

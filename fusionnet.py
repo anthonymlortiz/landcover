@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
+from group_norm import GroupNorm2d
 
 class Conv_residual_conv(nn.modules.Module):
 
@@ -24,7 +25,7 @@ class Conv_residual_conv(nn.modules.Module):
 def conv_block(in_dim,out_dim,act_fn):
     model = nn.Sequential(
         nn.Conv2d(in_dim,out_dim, kernel_size=3, stride=1, padding=1),
-        GroupNorm(out_dim),
+        GroupNorm2d(out_dim, num_groups=4, affine=True, track_running_stats=True),
         act_fn,
     )
     return model
@@ -33,7 +34,7 @@ def conv_block(in_dim,out_dim,act_fn):
 def conv_trans_block(in_dim,out_dim,act_fn):
     model = nn.Sequential(
         nn.ConvTranspose2d(in_dim,out_dim, kernel_size=3, stride=2, padding=1,output_padding=1),
-        GroupNorm(out_dim),
+        GroupNorm2d(out_dim, num_groups=4, affine=True, track_running_stats=True),
         act_fn,
     )
     return model
@@ -48,7 +49,7 @@ def conv_block_2(in_dim,out_dim,act_fn):
     model = nn.Sequential(
         conv_block(in_dim,out_dim,act_fn),
         nn.Conv2d(out_dim,out_dim, kernel_size=3, stride=1, padding=1),
-        GroupNorm(out_dim),
+        GroupNorm2d(out_dim, num_groups=4, affine=True, track_running_stats=True),
     )
     return model
 
@@ -58,7 +59,7 @@ def conv_block_3(in_dim,out_dim,act_fn):
         conv_block(in_dim,out_dim,act_fn),
         conv_block(out_dim,out_dim,act_fn),
         nn.Conv2d(out_dim,out_dim, kernel_size=3, stride=1, padding=1),
-        GroupNorm(out_dim),
+        GroupNorm2d(out_dim, num_groups=4, affine=True, track_running_stats=True),
     )
     return model
 
@@ -155,6 +156,8 @@ class Fusionnet(nn.modules.Module):
         out = self.out_2(out)
         # out = torch.clamp(out, min=-1, max=1)
         return out
+
+    """
 class GroupNorm(nn.Module):
     def __init__(self, num_features, channels_per_group=8, eps=1e-5):
         super(GroupNorm, self).__init__()
@@ -388,6 +391,7 @@ class GroupNorm(nn.Module):
         x = x.view(N, C, H, W)
 
         return x * self.weight + self.bias
+        """
 
 
 """
