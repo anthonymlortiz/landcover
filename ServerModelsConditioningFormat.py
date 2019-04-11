@@ -78,7 +78,7 @@ class Finetuned_unet_gn_model(BackendModel):
 
 
     def run_model_on_tile(self, naip_tile, gammas, betas, dropouts, batch_size=32):
-        y_hat = self.predict_entire_image_gammas_unet(naip_tile)
+        y_hat = self.predict_entire_image_unet_fine(naip_tile)
         output = y_hat[:, :, 1:5]
         return softmax(output)
 
