@@ -106,6 +106,88 @@ class Finetuned_unet_gn_model(BackendModel):
         pred = np.moveaxis(pred, 0, 1)
         return pred
 
+class Finetuned_fusionnet_gn_model(BackendModel):
+
+    def __init__(self, model_fn, gpuid):
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(gpuid)
+        self.output_channels = 5
+        self.input_size = 512
+        self.model_fn = model_fn
+        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_runningstats8/training/params.json", "r"))["model_opts"]
+        self.fusionnet = Fusionnet(self.opts)
+        checkpoint = torch.load("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_runningstats8/training/checkpoint_best.pth.tar")
+        self.fusionnet.load_state_dict(checkpoint['model'])
+        self.fusionnet.eval()
+        for param in self.fusionnet.parameters():
+            param.requires_grad = False
+
+        # Parameters of newly constructed modules have requires_grad=True by default
+        self.model = GroupParamsFusionnet(self.fusionnet)
+        checkpoint1 = torch.load(self.model_fn)
+        self.model.load_state_dict(checkpoint1)
+
+    def run(self, naip_data, naip_fn, extent, buffer, gammas, betas, dropouts):
+        return self.run_model_on_tile(naip_data, gammas, betas, dropouts), os.path.basename(self.model_fn)
+
+
+    def run_model_on_tile(self, naip_tile, gammas, betas, dropouts, batch_size=32):
+        y_hat = self.predict_entire_image_fusionnet_fine(naip_tile)
+        output = y_hat[:, :, 1:5]
+        return softmax(output)
+
+    def predict_entire_image_fusionnet_fine(self, x):
+        x = np.swapaxes(x, 0, 2)
+        x = np.swapaxes(x, 1, 2)
+        if torch.cuda.is_available():
+            self.model.cuda()
+        x = np.rollaxis(x, 2, 1)
+        x = x[:4, :, :]
+        naip_tile = x / 255.0
+
+        down_weight_padding = 40
+        height = naip_tile.shape[1]
+        width = naip_tile.shape[2]
+
+        stride_x = self.input_size - down_weight_padding * 2
+        stride_y = self.input_size - down_weight_padding * 2
+
+        output = np.zeros((self.output_channels, height, width), dtype=np.float32)
+        counts = np.zeros((height, width), dtype=np.float32) + 0.000000001
+        kernel = np.ones((self.input_size, self.input_size), dtype=np.float32) * 0.1
+        kernel[20:-20, 20:-20] = 1
+        kernel[down_weight_padding:down_weight_padding + stride_y,
+        down_weight_padding:down_weight_padding + stride_x] = 5
+
+        batch = []
+        batch_indices = []
+
+        batch_count = 0
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        for y_index in (list(range(0, height - self.input_size, stride_y)) + [height - self.input_size, ]):
+            for x_index in (list(range(0, width - self.input_size, stride_x)) + [width - self.input_size, ]):
+                naip_im = naip_tile[:, y_index:y_index + self.input_size, x_index:x_index + self.input_size]
+                batch.append(naip_im)
+                batch_indices.append((y_index, x_index))
+                batch_count += 1
+        batch_arr = np.zeros((batch_count, 4, self.input_size, self.input_size))
+        i = 0
+        for im in batch:
+            batch_arr[i, :, :, :] = im
+            i += 1
+        batch = torch.from_numpy(batch_arr).float().to(device)
+        model_output = self.model.forward(batch)
+        model_output = (Variable(model_output).data).cpu().numpy()
+        for i, (y, x) in enumerate(batch_indices):
+            output[:, y:y + self.input_size, x:x + self.input_size] += model_output[i] * kernel[np.newaxis, ...]
+            counts[y:y + self.input_size, x:x + self.input_size] += kernel
+
+        output = output / counts[np.newaxis, ...]
+        pred = np.rollaxis(output, 0, 3)
+        pred = np.moveaxis(pred, 0, 1)
+        return pred
+
 
 class InferenceFramework():
     def __init__(self, model, opts):
@@ -379,7 +461,46 @@ class InferenceFramework():
         pred = np.moveaxis(pred, 0, 1)
         return pred
 
+class GroupParamsFusionnet(nn.Module):
 
+    def __init__(self, model):
+        super(GroupParams, self).__init__()
+        self.gammas = nn.Parameter(torch.ones((1, 32, 1, 1)))
+        self.betas = nn.Parameter(torch.zeros((1, 32, 1, 1)))
+        self.model = model
+
+    def forward(self, input):
+
+
+        down_1 = self.down_1(input)
+        pool_1 = self.pool_1(down_1)
+        down_2 = self.down_2(pool_1)
+        pool_2 = self.pool_2(down_2)
+        down_3 = self.down_3(pool_2)
+        pool_3 = self.pool_3(down_3)
+        down_4 = self.down_4(pool_3)
+        pool_4 = self.pool_4(down_4)
+
+        bridge = self.bridge(pool_4)
+
+        deconv_1 = self.deconv_1(bridge)
+        skip_1 = (deconv_1 + down_4) / 2
+        up_1 = self.up_1(skip_1)
+        deconv_2 = self.deconv_2(up_1)
+        skip_2 = (deconv_2 + down_3) / 2
+        up_2 = self.up_2(skip_2)
+        deconv_3 = self.deconv_3(up_2)
+        skip_3 = (deconv_3 + down_2) / 2
+        up_3 = self.up_3(skip_3)
+        deconv_4 = self.deconv_4(up_3)
+        skip_4 = (deconv_4 + down_1) / 2
+        up_4 = self.up_4(skip_4)
+        up_4 = up_4 * self.gammas + self.betas
+
+        out = self.out(up_4)
+        out = self.out_2(out)
+        # out = torch.clamp(out, min=-1, max=1)
+        return out
 
 
 class GroupParams(nn.Module):
