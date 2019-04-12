@@ -514,10 +514,6 @@ class GroupParams(nn.Module):
         super(GroupParams, self).__init__()
         self.gammas = nn.Parameter(torch.ones((1, 32, 1, 1)))
         self.betas = nn.Parameter(torch.zeros((1, 32, 1, 1)))
-        self.gammas1 = nn.Parameter(torch.ones((1, 32, 1, 1)))
-        self.betas1 = nn.Parameter(torch.zeros((1, 32, 1, 1)))
-        self.gammas2 = nn.Parameter(torch.ones((1, 64, 1, 1)))
-        self.betas2 = nn.Parameter(torch.zeros((1, 64, 1, 1)))
         self.model = model
 
     def forward(self, x):
@@ -554,7 +550,6 @@ class GroupParams(nn.Module):
         x = self.model.up_2(x, conv3_out, conv3_dim)
         x = self.model.up_3(x, conv2_out, conv2_dim)
         x = self.model.up_4(x, conv1_out, conv1_dim)
-        x = x * self.gammas1 + self.betas1
 
 
         return self.model.conv_final(x)
