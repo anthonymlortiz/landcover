@@ -24,7 +24,7 @@ class Fusionnet_gn_model(BackendModel):
         self.model_fn = model_fn
        # self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_conditional_superres512/training/params.json", "r"))["model_opts"]
         self.opts = json.load(
-            open("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_runningstats8/training/params.json",
+            open("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_8/training/params.json",
                  "r"))["model_opts"]
 
     def run(self, naip_data, naip_fn, extent, buffer, gammas, betas, dropouts):
@@ -114,9 +114,9 @@ class Finetuned_fusionnet_gn_model(BackendModel):
         self.output_channels = 5
         self.input_size = 512
         self.model_fn = model_fn
-        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_runningstats8/training/params.json", "r"))["model_opts"]
+        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_8/training/params.json", "r"))["model_opts"]
         self.fusionnet = Fusionnet(self.opts)
-        checkpoint = torch.load("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_runningstats8/training/checkpoint_best.pth.tar")
+        checkpoint = torch.load("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_8/training/checkpoint_best.pth.tar")
         self.fusionnet.load_state_dict(checkpoint['model'])
         self.fusionnet.eval()
         for param in self.fusionnet.parameters():
@@ -467,8 +467,6 @@ class GroupParamsFusionnet(nn.Module):
         super(GroupParamsFusionnet, self).__init__()
         self.gammas = nn.Parameter(torch.ones((1, 32, 1, 1)))
         self.betas = nn.Parameter(torch.zeros((1, 32, 1, 1)))
-        self.gammas2 = nn.Parameter(torch.ones((1, 64, 1, 1)))
-        self.betas2 = nn.Parameter(torch.zeros((1, 64, 1, 1)))
         self.model = model
 
     def forward(self, input):
@@ -495,7 +493,7 @@ class GroupParamsFusionnet(nn.Module):
         deconv_3 = self.model.deconv_3(up_2)
         skip_3 = (deconv_3 + down_2) / 2
         up_3 = self.model.up_3(skip_3)
-        up_3 = up_3 * self.gammas2 + self.betas2
+       # up_3 = up_3 * self.gammas2 + self.betas2
 
         deconv_4 = self.model.deconv_4(up_3)
         skip_4 = (deconv_4 + down_1) / 2
