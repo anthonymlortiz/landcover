@@ -537,7 +537,6 @@ class GroupParams(nn.Module):
 
 
         x, conv2_out, conv2_dim = self.model.down_2(x)
-        x = x * self.gammas2 + self.betas2
 
         x, conv3_out, conv3_dim = self.model.down_3(x)
         x, conv4_out, conv4_dim = self.model.down_4(x)
