@@ -464,41 +464,46 @@ class InferenceFramework():
 class GroupParamsFusionnet(nn.Module):
 
     def __init__(self, model):
-        super(GroupParams, self).__init__()
+        super(GroupParamsFusionnet, self).__init__()
         self.gammas = nn.Parameter(torch.ones((1, 32, 1, 1)))
         self.betas = nn.Parameter(torch.zeros((1, 32, 1, 1)))
+        self.gammas2 = nn.Parameter(torch.ones((1, 64, 1, 1)))
+        self.betas2 = nn.Parameter(torch.zeros((1, 64, 1, 1)))
         self.model = model
 
     def forward(self, input):
 
 
-        down_1 = self.down_1(input)
-        pool_1 = self.pool_1(down_1)
-        down_2 = self.down_2(pool_1)
-        pool_2 = self.pool_2(down_2)
-        down_3 = self.down_3(pool_2)
-        pool_3 = self.pool_3(down_3)
-        down_4 = self.down_4(pool_3)
-        pool_4 = self.pool_4(down_4)
+        down_1 = self.model.down_1(input)
+        pool_1 = self.model.pool_1(down_1)
+        #pool_1 = pool_1 * self.gammas + self.betas
+        down_2 = self.model.down_2(pool_1)
+        pool_2 = self.model.pool_2(down_2)
+        down_3 = self.model.down_3(pool_2)
+        pool_3 = self.model.pool_3(down_3)
+        down_4 = self.model.down_4(pool_3)
+        pool_4 = self.model.pool_4(down_4)
 
-        bridge = self.bridge(pool_4)
+        bridge = self.model.bridge(pool_4)
 
-        deconv_1 = self.deconv_1(bridge)
+        deconv_1 = self.model.deconv_1(bridge)
         skip_1 = (deconv_1 + down_4) / 2
-        up_1 = self.up_1(skip_1)
-        deconv_2 = self.deconv_2(up_1)
+        up_1 = self.model.up_1(skip_1)
+        deconv_2 = self.model.deconv_2(up_1)
         skip_2 = (deconv_2 + down_3) / 2
-        up_2 = self.up_2(skip_2)
-        deconv_3 = self.deconv_3(up_2)
+        up_2 = self.model.up_2(skip_2)
+        deconv_3 = self.model.deconv_3(up_2)
         skip_3 = (deconv_3 + down_2) / 2
-        up_3 = self.up_3(skip_3)
-        deconv_4 = self.deconv_4(up_3)
+        up_3 = self.model.up_3(skip_3)
+        up_3 = up_3 * self.gammas2 + self.betas2
+
+        deconv_4 = self.model.deconv_4(up_3)
         skip_4 = (deconv_4 + down_1) / 2
-        up_4 = self.up_4(skip_4)
+        up_4 = self.model.up_4(skip_4)
         up_4 = up_4 * self.gammas + self.betas
 
-        out = self.out(up_4)
-        out = self.out_2(out)
+        out = self.model.out(up_4)
+        out = self.model.out_2(out)
         # out = torch.clamp(out, min=-1, max=1)
         return out
 
