@@ -24,7 +24,7 @@ class Fusionnet_gn_model(BackendModel):
         self.model_fn = model_fn
        # self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_conditional_superres512/training/params.json", "r"))["model_opts"]
         self.opts = json.load(
-            open("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_8/training/params.json",
+            open("/mnt/blobfuse/train-output/conditioning/models/backup_fusionnet32_gn_8_isotropic/training/params.json",
                  "r"))["model_opts"]
 
     def run(self, naip_data, naip_fn, extent, buffer, gammas, betas, dropouts):
