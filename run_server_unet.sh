@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 CONF_FILE="pytorch/params/hyper_params.json"
 MODEL="gn_unet"
-MODEL_FN="/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_isotropic_nn2/training/checkpoint_best.pth.tar"
+MODEL_FN="/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_isotropic_nn8/training/checkpoint_best.pth.tar"
 
 python -u backend_server.py \
     --model ${MODEL} \
