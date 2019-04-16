@@ -518,22 +518,6 @@ class GroupParams(nn.Module):
 
     def forward(self, x):
         x, conv1_out, conv1_dim = self.model.down_1(x)
-        x = x * self.gammas + self.betas
-
-        # gammas = np.zeros((1, 32, 1, 1))
-        # gammas[0, :8, 0, 0] = self.gammas.detach().numpy()[0]
-        # gammas[0, 8:16, 0, 0] = self.gammas.detach().numpy()[1]
-        # gammas[0, 16:24, 0, 0] = self.gammas.detach().numpy()[2]
-        # gammas[0, 24:32, 0, 0] = self.gammas.detach().numpy()[3]
-        #
-        # betas = np.zeros((1, 32, 1, 1))
-        # betas[0, :8, 0, 0] = self.betas.detach().numpy()[0]
-        # betas[0, 8:16, 0, 0] = self.betas.detach().numpy()[1]
-        # betas[0, 16:24, 0, 0] = self.betas.detach().numpy()[2]
-        # betas[0, 24:32, 0, 0] = self.betas.detach().numpy()[3]
-
-       # gammas = torch.Tensor(gammas).to('cuda')
-       # betas = torch.Tensor(betas).to('cuda')
 
 
         x, conv2_out, conv2_dim = self.model.down_2(x)
@@ -549,6 +533,7 @@ class GroupParams(nn.Module):
         x = self.model.up_2(x, conv3_out, conv3_dim)
         x = self.model.up_3(x, conv2_out, conv2_dim)
         x = self.model.up_4(x, conv1_out, conv1_dim)
+        x = x * self.gammas + self.betas
 
 
         return self.model.conv_final(x)
