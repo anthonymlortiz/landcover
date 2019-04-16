@@ -44,7 +44,7 @@ class Unet_gn_model(BackendModel):
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = str(gpuid)
         self.model_fn = model_fn
-        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_runningstats4/training/params.json", "r"))["model_opts"]
+        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_isotropic_nn/training/params.json", "r"))["model_opts"]
 
     def run(self, naip_data, naip_fn, extent, buffer, gammas, betas, dropouts):
         return self.run_model_on_tile(naip_data, gammas, betas, dropouts), os.path.basename(self.model_fn)
@@ -63,9 +63,9 @@ class Finetuned_unet_gn_model(BackendModel):
         os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
         os.environ["CUDA_VISIBLE_DEVICES"] = str(gpuid)
         self.model_fn = model_fn
-        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_runningstats4/training/params.json", "r"))["model_opts"]
+        self.opts = json.load(open("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_isotropic_nn/training/params.json", "r"))["model_opts"]
         self.unet = Unet(self.opts)
-        checkpoint = torch.load("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_runningstats4/training/checkpoint_best.pth.tar")
+        checkpoint = torch.load("/mnt/blobfuse/train-output/conditioning/models/backup_unet_gn_isotropic_nn/training/checkpoint_best.pth.tar")
         self.unet.load_state_dict(checkpoint['model'])
         self.unet.eval()
         for param in self.unet.parameters():
