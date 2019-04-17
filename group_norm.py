@@ -124,7 +124,9 @@ class GroupNormNN(nn.Module):
         self.eps = eps
         self.window_size = window_size
 
+
     def forward(self, x):
+        start = time.time()
         N,C,H,W = x.size()
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         G = int(C/self.channels_per_group)
@@ -145,7 +147,7 @@ class GroupNormNN(nn.Module):
                 pad2d =(int(math.floor((W- c)/2)), int(math.ceil((W- c)/2)), int(math.floor((H- r)/2)), int(math.ceil((H- r)/2)))
                 padded_means = F.pad(means, pad2d, 'replicate')
                 padded_vars = F.pad(var, pad2d, 'replicate')
-            start = time.time()
+
             for i in range(G):
                 x[:, i * self.channels_per_group:i * self.channels_per_group + self.channels_per_group, :, :] = (x[:,
                                                                                                                  i * self.channels_per_group:i * self.channels_per_group + self.channels_per_group,
@@ -153,8 +155,7 @@ class GroupNormNN(nn.Module):
                                                                                                                  :] - torch.unsqueeze(
                     padded_means[:, i, :, :], dim=1).to(device)) / (torch.unsqueeze(padded_vars[:, i, :, :], dim=1).to(
                     device) + self.eps).sqrt()
-            end = time.time()
-            print("Group time",end-start)
+
         else:
             x = x.view(N, G, -1)
             mean = x.mean(-1, keepdim=True)
@@ -162,5 +163,7 @@ class GroupNormNN(nn.Module):
 
             x = (x - mean) / (var + self.eps).sqrt()
             x = x.view(N, C, H, W)
+        end = time.time()
+        print("Group time", end - start)
 
         return x * self.weight + self.bias
