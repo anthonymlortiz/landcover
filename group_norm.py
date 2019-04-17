@@ -129,12 +129,10 @@ class GroupNormNN(nn.Module):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         G = int(C/self.channels_per_group)
         assert C % G == 0
-        start1 = time.time()
         if self.window_size[0] < H and self.window_size[1]<W:
             with torch.no_grad():
                 x_new = torch.unsqueeze(x, dim=1)
                 weights = torch.ones((1, 1, self.channels_per_group,) + self.window_size).to(device)
-                start = time.time()
                 sums = F.conv3d(x_new, weights, stride=[self.channels_per_group, 1, 1])
                 x_squared = x_new * x_new
                 squares = F.conv3d(x_squared, weights, stride=(self.channels_per_group, 1, 1))
@@ -145,32 +143,9 @@ class GroupNormNN(nn.Module):
                 _,_, r,c = means.size()
 
                 pad2d =(int(math.floor((W- c)/2)), int(math.ceil((W- c)/2)), int(math.floor((H- r)/2)), int(math.ceil((H- r)/2)))
-                print("paddind pattern",pad2d)
                 padded_means = F.pad(means, pad2d, 'replicate')
-                print("padded shape",padded_means.shape)
-
-               # padded_means[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
-                #int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = means
-                end = time.time()
-
-               # padded_means[:, :, 0:int(self.window_size[0] / 2), :] = torch.unsqueeze(padded_means[:, :, int(self.window_size[0] / 2), :], dim=2)
-               # padded_means[:, :, H - int(self.window_size[0] / 2):, :] = torch.unsqueeze(padded_means[:, :,
-                #                                                           H - int(self.window_size[0] / 2), :], dim=2)
-               # padded_means[:, :, :, 0:int(self.window_size[1] / 2)] = torch.unsqueeze(padded_means[:, :, :, int(self.window_size[1] / 2)], dim=3)
-               # padded_means[:, :, :, W - int(self.window_size[1] / 2):] = torch.unsqueeze(padded_means[:, :, :,
-                #                                                           W - int(self.window_size[1] / 2)], dim=3)
 
                 padded_vars = F.pad(var, pad2d, 'replicate')
-                #padded_vars[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
-                #int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = var
-
-                #padded_vars[:, :, 0:int(self.window_size[0] / 2), :] = torch.unsqueeze(padded_vars[:, :, int(self.window_size[0] / 2), :], dim=2)
-                #padded_vars[:, :, H - int(self.window_size[0] / 2):, :] = torch.unsqueeze(padded_vars[:, :,
-                #                                                          H - int(self.window_size[0] / 2), :], dim=2)
-                #padded_vars[:, :, :, 0:int(self.window_size[1] / 2)] = torch.unsqueeze(padded_vars[:, :, :, int(self.window_size[1] / 2)], dim=3)
-                #padded_vars[:, :, :, W - int(self.window_size[1] / 2):] = torch.unsqueeze(padded_vars[:, :, :,
-                #                                                          W - int(self.window_size[1] / 2)], dim=3)
-
             for i in range(G):
                 x[:, i * self.channels_per_group:i * self.channels_per_group + self.channels_per_group, :, :] = (x[:,
                                                                                                                  i * self.channels_per_group:i * self.channels_per_group + self.channels_per_group,
@@ -178,11 +153,6 @@ class GroupNormNN(nn.Module):
                                                                                                                  :] - torch.unsqueeze(
                     padded_means[:, i, :, :], dim=1).to(device)) / (torch.unsqueeze(padded_vars[:, i, :, :], dim=1).to(
                     device) + self.eps).sqrt()
-
-
-            end1 = time.time()
-            print("Conv time:", end - start)
-            print("Group norm time time:", end1 - start1)
         else:
             x = x.view(N, G, -1)
             mean = x.mean(-1, keepdim=True)
