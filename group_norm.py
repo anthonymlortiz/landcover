@@ -142,19 +142,20 @@ class GroupNormNN(nn.Module):
                 n = self.window_size[0] * self.window_size[1] * self.channels_per_group
                 means = torch.squeeze((sums / n), dim=1)
                 var = torch.squeeze((1.0 / n * (squares - sums * sums / n)), dim=1)
+                means = means.expand((-1,-1,H,W))
 
-                padded_means = torch.zeros((N, G, H, W))
+                #padded_means = torch.zeros((N, G, H, W))
 
-                padded_means[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
-                int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = means[:,:,:,:]
+               # padded_means[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
+                #int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = means
                 end = time.time()
 
-                padded_means[:, :, 0:int(self.window_size[0] / 2), :] = torch.unsqueeze(padded_means[:, :, int(self.window_size[0] / 2), :], dim=2)
-                padded_means[:, :, H - int(self.window_size[0] / 2):, :] = torch.unsqueeze(padded_means[:, :,
-                                                                           H - int(self.window_size[0] / 2), :], dim=2)
-                padded_means[:, :, :, 0:int(self.window_size[1] / 2)] = torch.unsqueeze(padded_means[:, :, :, int(self.window_size[1] / 2)], dim=3)
-                padded_means[:, :, :, W - int(self.window_size[1] / 2):] = torch.unsqueeze(padded_means[:, :, :,
-                                                                           W - int(self.window_size[1] / 2)], dim=3)
+               # padded_means[:, :, 0:int(self.window_size[0] / 2), :] = torch.unsqueeze(padded_means[:, :, int(self.window_size[0] / 2), :], dim=2)
+               # padded_means[:, :, H - int(self.window_size[0] / 2):, :] = torch.unsqueeze(padded_means[:, :,
+                #                                                           H - int(self.window_size[0] / 2), :], dim=2)
+               # padded_means[:, :, :, 0:int(self.window_size[1] / 2)] = torch.unsqueeze(padded_means[:, :, :, int(self.window_size[1] / 2)], dim=3)
+               # padded_means[:, :, :, W - int(self.window_size[1] / 2):] = torch.unsqueeze(padded_means[:, :, :,
+                #                                                           W - int(self.window_size[1] / 2)], dim=3)
 
                 padded_vars = torch.zeros((N, G, H, W))
                 padded_vars[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
@@ -168,7 +169,7 @@ class GroupNormNN(nn.Module):
                                                                           W - int(self.window_size[1] / 2)], dim=3)
 
             for i in range(G):
-                x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:] = (x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:]- torch.unsqueeze(padded_means[:,i,:,:], dim=1).to(device)) / (torch.unsqueeze(padded_vars[:,i,:,:], dim=1).to(device) + self.eps).sqrt()
+                x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:] = (x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:]- torch.unsqueeze(means[:,i,:,:], dim=1).to(device)) / (torch.unsqueeze(padded_vars[:,i,:,:], dim=1).to(device) + self.eps).sqrt()
             end1 = time.time()
             print("Conv time:", end - start)
             print("Group norm time time:", end1 - start1)
