@@ -136,7 +136,6 @@ class GroupNormNN(nn.Module):
                 weights = torch.ones((1, 1, self.channels_per_group,) + self.window_size).to(device)
                 start = time.time()
                 sums = F.conv3d(x_new, weights, stride=[self.channels_per_group, 1, 1])
-
                 x_squared = x_new * x_new
                 squares = F.conv3d(x_squared, weights, stride=(self.channels_per_group, 1, 1))
                 end = time.time()
@@ -168,8 +167,8 @@ class GroupNormNN(nn.Module):
             for i in range(G):
                 x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:] = (x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:]- torch.unsqueeze(padded_means[:,i,:,:], dim=1).to(device)) / (torch.unsqueeze(padded_vars[:,i,:,:], dim=1).to(device) + self.eps).sqrt()
             end1 = time.time()
-            print("Conv time:", start - end)
-            print("Group norm time time:", start1 - end1)
+            print("Conv time:", end - start)
+            print("Group norm time time:", end1 - start1)
         else:
             x = x.view(N, G, -1)
             mean = x.mean(-1, keepdim=True)
