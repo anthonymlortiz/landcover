@@ -145,7 +145,9 @@ class GroupNormNN(nn.Module):
                 _,_, r,c = means.size()
 
                 pad2d =(W- int(c/2), W- int(c/2), H- int(r/2), H- int(r/2))
+                print("paddind pattern",pad2d)
                 padded_means = F.pad(means, pad2d, 'replicate')
+                print("padded shape",padded_means.shape)
 
                # padded_means[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
                 #int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = means
