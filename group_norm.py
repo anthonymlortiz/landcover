@@ -169,7 +169,7 @@ class GroupNormNN(nn.Module):
                                                                           W - int(self.window_size[1] / 2)], dim=3)
 
             for i in range(G):
-                x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:] = (x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:]- torch.unsqueeze(means.expand((N,G,H,W))[:,i,:,:], dim=1).to(device)) / (torch.unsqueeze(padded_vars[:,i,:,:], dim=1).to(device) + self.eps).sqrt()
+                x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:] = (x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:]- torch.unsqueeze(means.expand((N,G,H,W)).clone()[:,i,:,:], dim=1).to(device)) / (torch.unsqueeze(padded_vars[:,i,:,:], dim=1).to(device) + self.eps).sqrt()
             end1 = time.time()
             print("Conv time:", end - start)
             print("Group norm time time:", end1 - start1)
