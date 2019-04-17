@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.batchnorm import _BatchNorm
 import time
-
+import math
 def group_norm(input, group, running_mean, running_var, weight=None, bias=None,
                   use_input_stats=False, momentum=0.1, eps=1e-5):
     r"""Applies Group Normalization for channels in the same group in each data sample in a
@@ -144,7 +144,7 @@ class GroupNormNN(nn.Module):
                 var = torch.squeeze((1.0 / n * (squares - sums * sums / n)), dim=1)
                 _,_, r,c = means.size()
 
-                pad2d =(int((W- c)/2), int((W- c)/2), int((H- r)/2), int((H- r)/2))
+                pad2d =(int(math.floor(W- c)/2), int(math.ceil(W- c)/2), int(math.floor(H- r)/2), int(math.ceil(H- r)/2))
                 print("paddind pattern",pad2d)
                 padded_means = F.pad(means, pad2d, 'replicate')
                 print("padded shape",padded_means.shape)
