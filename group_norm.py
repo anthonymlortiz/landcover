@@ -138,13 +138,14 @@ class GroupNormNN(nn.Module):
                 sums = F.conv3d(x_new, weights, stride=[self.channels_per_group, 1, 1])
                 x_squared = x_new * x_new
                 squares = F.conv3d(x_squared, weights, stride=(self.channels_per_group, 1, 1))
-                end = time.time()
+
                 n = self.window_size[0] * self.window_size[1] * self.channels_per_group
                 means = torch.squeeze((sums / n), dim=1)
                 var = torch.squeeze((1.0 / n * (squares - sums * sums / n)), dim=1)
                 padded_means = torch.zeros((N, G, H, W))
                 padded_means[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
                 int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = means
+                end = time.time()
 
                 padded_means[:, :, 0:int(self.window_size[0] / 2), :] = torch.unsqueeze(padded_means[:, :, int(self.window_size[0] / 2), :], dim=2)
                 padded_means[:, :, H - int(self.window_size[0] / 2):, :] = torch.unsqueeze(padded_means[:, :,
