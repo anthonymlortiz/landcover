@@ -160,16 +160,16 @@ class GroupNormNN(nn.Module):
                # padded_means[:, :, :, W - int(self.window_size[1] / 2):] = torch.unsqueeze(padded_means[:, :, :,
                 #                                                           W - int(self.window_size[1] / 2)], dim=3)
 
-                padded_vars = torch.zeros((N, G, H, W))
-                padded_vars[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
-                int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = var
+                padded_vars = F.pad(means, pad2d, 'replicate')
+                #padded_vars[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
+                #int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = var
 
-                padded_vars[:, :, 0:int(self.window_size[0] / 2), :] = torch.unsqueeze(padded_vars[:, :, int(self.window_size[0] / 2), :], dim=2)
-                padded_vars[:, :, H - int(self.window_size[0] / 2):, :] = torch.unsqueeze(padded_vars[:, :,
-                                                                          H - int(self.window_size[0] / 2), :], dim=2)
-                padded_vars[:, :, :, 0:int(self.window_size[1] / 2)] = torch.unsqueeze(padded_vars[:, :, :, int(self.window_size[1] / 2)], dim=3)
-                padded_vars[:, :, :, W - int(self.window_size[1] / 2):] = torch.unsqueeze(padded_vars[:, :, :,
-                                                                          W - int(self.window_size[1] / 2)], dim=3)
+                #padded_vars[:, :, 0:int(self.window_size[0] / 2), :] = torch.unsqueeze(padded_vars[:, :, int(self.window_size[0] / 2), :], dim=2)
+                #padded_vars[:, :, H - int(self.window_size[0] / 2):, :] = torch.unsqueeze(padded_vars[:, :,
+                #                                                          H - int(self.window_size[0] / 2), :], dim=2)
+                #padded_vars[:, :, :, 0:int(self.window_size[1] / 2)] = torch.unsqueeze(padded_vars[:, :, :, int(self.window_size[1] / 2)], dim=3)
+                #padded_vars[:, :, :, W - int(self.window_size[1] / 2):] = torch.unsqueeze(padded_vars[:, :, :,
+                #                                                          W - int(self.window_size[1] / 2)], dim=3)
 
             for i in range(G):
                 x[:, i * self.channels_per_group:i * self.channels_per_group + self.channels_per_group, :, :] = (x[:,
