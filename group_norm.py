@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.batchnorm import _BatchNorm
+import time
 
 def group_norm(input, group, running_mean, running_var, weight=None, bias=None,
                   use_input_stats=False, momentum=0.1, eps=1e-5):
@@ -128,15 +129,17 @@ class GroupNormNN(nn.Module):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         G = int(C/self.channels_per_group)
         assert C % G == 0
-
+        start1 = time.time()
         if self.window_size[0] < H and self.window_size[1]<W:
             with torch.no_grad():
                 x_new = torch.unsqueeze(x, dim=1)
                 weights = torch.ones((1, 1, self.channels_per_group,) + self.window_size).to(device)
-
+                start = time.time()
                 sums = F.conv3d(x_new, weights, stride=[self.channels_per_group, 1, 1])
+
                 x_squared = x_new * x_new
                 squares = F.conv3d(x_squared, weights, stride=(self.channels_per_group, 1, 1))
+                end = time.time()
                 n = self.window_size[0] * self.window_size[1] * self.channels_per_group
                 means = torch.squeeze((sums / n), dim=1)
                 var = torch.squeeze((1.0 / n * (squares - sums * sums / n)), dim=1)
@@ -164,7 +167,9 @@ class GroupNormNN(nn.Module):
 
             for i in range(G):
                 x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:] = (x[:,i*self.channels_per_group:i*self.channels_per_group+self.channels_per_group,:,:]- torch.unsqueeze(padded_means[:,i,:,:], dim=1).to(device)) / (torch.unsqueeze(padded_vars[:,i,:,:], dim=1).to(device) + self.eps).sqrt()
-
+            end1 = time.time()
+            print("Conv time:", start - end)
+            print("Group norm time time:", start1 - end1)
         else:
             x = x.view(N, G, -1)
             mean = x.mean(-1, keepdim=True)
