@@ -144,7 +144,7 @@ class GroupNormNN(nn.Module):
                 var = torch.squeeze((1.0 / n * (squares - sums * sums / n)), dim=1)
                 _,_, r,c = means.size()
 
-                pad2d =(W- int(c/2), W- int(c/2), H- int(r/2), H- int(r/2))
+                pad2d =(int((W- c)/2), int((W- c)/2), int((H- r)/2), int((H- r)/2))
                 print("paddind pattern",pad2d)
                 padded_means = F.pad(means, pad2d, 'replicate')
                 print("padded shape",padded_means.shape)
