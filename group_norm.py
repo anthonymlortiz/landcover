@@ -160,7 +160,7 @@ class GroupNormNN(nn.Module):
                # padded_means[:, :, :, W - int(self.window_size[1] / 2):] = torch.unsqueeze(padded_means[:, :, :,
                 #                                                           W - int(self.window_size[1] / 2)], dim=3)
 
-                padded_vars = F.pad(means, pad2d, 'replicate')
+                padded_vars = F.pad(var, pad2d, 'replicate')
                 #padded_vars[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
                 #int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = var
 
