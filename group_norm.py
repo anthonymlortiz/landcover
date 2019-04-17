@@ -144,10 +144,10 @@ class GroupNormNN(nn.Module):
                 var = torch.squeeze((1.0 / n * (squares - sums * sums / n)), dim=1)
 
                 padded_means = torch.zeros((N, G, H, W))
-                end = time.time()
+
                 padded_means[:, :, int(self.window_size[0] / 2)-1:H - int(self.window_size[0] / 2),
                 int(self.window_size[1] / 2)-1:W - int(self.window_size[1] / 2)] = means
-
+                end = time.time()
 
                 padded_means[:, :, 0:int(self.window_size[0] / 2), :] = torch.unsqueeze(padded_means[:, :, int(self.window_size[0] / 2), :], dim=2)
                 padded_means[:, :, H - int(self.window_size[0] / 2):, :] = torch.unsqueeze(padded_means[:, :,
