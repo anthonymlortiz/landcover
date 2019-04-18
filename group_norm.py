@@ -136,13 +136,14 @@ class GroupNormNN(nn.Module):
                 x_new = torch.unsqueeze(x, dim=1)
                 #weights = torch.ones((1, 1, self.channels_per_group,) + self.window_size).to(device)
                 weights1 = torch.ones((1, 1, self.channels_per_group,1, self.window_size[1])).to(device)
-                weights2 = torch.ones((1, 1, self.channels_per_group, self.window_size[0],1)).to(device)
+                weights2 = torch.ones((1,1, 1, self.window_size[0],1)).to(device)
                 #sums = F.conv3d(x_new, weights, stride=[self.channels_per_group, 1, 1])
                 sums1 = F.conv3d(x_new, weights1, stride=[self.channels_per_group, 1, 1])
-                sums = F.conv2d(torch.squeeze(sums1, dim=1), weights2)
-                sums = torch.unsqueeze(sums, dim=1)
+                sums = F.conv3d(torch.squeeze(sums1, dim=1), weights2)
                 x_squared = x_new * x_new
-                squares = F.conv3d(x_squared, weights, stride=(self.channels_per_group, 1, 1))
+                squares1 = F.conv3d(x_squared, weights1, stride=[self.channels_per_group, 1, 1])
+                squares = F.conv3d(squares1, weights2)
+               # squares = F.conv3d(x_squared, weights, stride=(self.channels_per_group, 1, 1))
 
                 n = self.window_size[0] * self.window_size[1] * self.channels_per_group
                 means = torch.squeeze((sums / n), dim=1)
