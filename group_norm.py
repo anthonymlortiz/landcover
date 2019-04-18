@@ -116,7 +116,7 @@ class GroupNorm3d(_GroupNorm):
                              .format(input.dim()))
 
 class GroupNormNN(nn.Module):
-    def __init__(self, num_features, channels_per_group=8, window_size=(3,3), eps=1e-5):
+    def __init__(self, num_features, channels_per_group=8, window_size=(32,32), eps=1e-5):
         super(GroupNormNN, self).__init__()
         self.weight = nn.Parameter(torch.ones(1,num_features,1,1))
         self.bias = nn.Parameter(torch.zeros(1,num_features,1,1))
@@ -134,8 +134,12 @@ class GroupNormNN(nn.Module):
         if self.window_size[0] < H and self.window_size[1]<W:
             with torch.no_grad():
                 x_new = torch.unsqueeze(x, dim=1)
-                weights = torch.ones((1, 1, self.channels_per_group,) + self.window_size).to(device)
-                sums = F.conv3d(x_new, weights, stride=[self.channels_per_group, 1, 1])
+                #weights = torch.ones((1, 1, self.channels_per_group,) + self.window_size).to(device)
+                weights1 = torch.ones((1, 1, self.channels_per_group,1, self.window_size[1])).to(device)
+                weights2 = torch.ones((1, 1, self.channels_per_group, self.window_size[0],1)).to(device)
+                #sums = F.conv3d(x_new, weights, stride=[self.channels_per_group, 1, 1])
+                sums1 = F.conv3d(x_new, weights1, stride=[self.channels_per_group, 1, 1])
+                sums = F.conv3d(sums1, weights2, stride=[self.channels_per_group, 1, 1])
                 x_squared = x_new * x_new
                 squares = F.conv3d(x_squared, weights, stride=(self.channels_per_group, 1, 1))
 
